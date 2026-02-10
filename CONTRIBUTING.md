@@ -13,7 +13,7 @@ Because this code is generated, we **cannot accept Pull Requests** directly in t
 We value your feedback and contributions! Please use the following workflow:
 
 ### 1. Report Bugs or Request Features
-The best way to contribute is to **[Open an Issue](https://github.com/alogram/payrisk-go/issues)** in this repository.
+The best way to contribute is to **[Open an Issue](https://github.com/alogram/alogram-go/issues)** in this repository.
 - Provide a clear description of the issue or feature.
 - Include code snippets or error logs if applicable.
 

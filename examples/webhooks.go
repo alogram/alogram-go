@@ -8,7 +8,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/alogram/payrisk-go"
+	"github.com/alogram/alogram-go"
 )
 
 const WEBHOOK_SECRET = "whsec_..."

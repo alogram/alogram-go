@@ -8,12 +8,13 @@ import (
 	"context"
 	"io"
 	"math"
+	"math/rand"
 	"net/http"
 	"net/url"
 	"strings"
 	"time"
 
-	"github.com/alogram/payrisk-go/internal/payrisk_v1"
+	"github.com/alogram/alogram-go/internal/payrisk_v1"
 	"github.com/google/uuid"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -41,13 +42,16 @@ func newBaseClient(opts ClientOptions) baseClient {
 	cfg := payrisk_v1.NewConfiguration()
 	cfg.Debug = opts.Debug
 
-	if opts.BaseURL != "" {
-		u, err := url.Parse(opts.BaseURL)
-		if err == nil {
-			cfg.Host = u.Host
-			cfg.Scheme = u.Scheme
-			cfg.Servers = payrisk_v1.ServerConfigurations{{URL: u.Path}}
-		}
+	baseURL := opts.BaseURL
+	if baseURL == "" {
+		baseURL = "https://api.alogram.ai"
+	}
+
+	u, err := url.Parse(baseURL)
+	if err == nil {
+		cfg.Host = u.Host
+		cfg.Scheme = u.Scheme
+		cfg.Servers = payrisk_v1.ServerConfigurations{{URL: u.Path}}
 	}
 
 	if opts.APIKey != "" {
@@ -155,6 +159,14 @@ func (c *AlogramRiskClient) CheckRisk(ctx context.Context, req payrisk_v1.CheckR
 		}
 
 		backoff := time.Duration(math.Pow(2, float64(i))) * time.Second
+		// Add jitter: ±20%
+		jitter := time.Duration(rand.Int63n(int64(backoff) / 5))
+		if rand.Intn(2) == 0 {
+			backoff += jitter
+		} else {
+			backoff -= jitter
+		}
+
 		select {
 		case <-ctx.Done():
 			return nil, ctx.Err()

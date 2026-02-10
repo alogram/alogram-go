@@ -9,8 +9,8 @@ import (
 	"log"
 	"time"
 
-	"github.com/alogram/payrisk-go"
-	"github.com/alogram/payrisk-go/internal/payrisk_v1"
+	"github.com/alogram/alogram-go"
+	"github.com/alogram/alogram-go/internal/payrisk_v1"
 )
 
 func AsyncSignalsExample() {

@@ -2,7 +2,7 @@
 
 All notable changes to the Alogram PayRisk Go SDK will be documented in this file.
 
-## [0.1.6-rc.2] - 2026-02-10
+## [0.1.6-rc.3] - 2026-02-10
 
 ### Added
 - Standardized "Smart" client architecture with hand-written façade.
@@ -12,7 +12,7 @@ All notable changes to the Alogram PayRisk Go SDK will be documented in this fil
 
 ### Changed
 - Optimized `net/http` transport configuration for production keep-alives.
-- Synchronized with Payments Risk API v0.1.6-rc.2.
+- Synchronized with Payments Risk API v0.1.6-rc.3.
 
 ## [0.1.6-rc.1] - 2026-02-10
 

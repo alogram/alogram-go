@@ -3,7 +3,7 @@ Payments Risk API
 
 API for detecting and scoring fraud for purchases, with lifecycle labeling and behavioral signals. v1 focuses on purchases only (`/risk/check`), with future account/session and KYC checks stubbed below. 
 
-API version: 0.1.6
+API version: 0.1.6-rc.2
 Contact: support@alogram.ai
 */
 
@@ -317,6 +317,7 @@ func (a *PayriskAPIService) GetFraudScoresExecute(r ApiGetFraudScoresRequest) (*
 		parameterAddToHeaderOrQuery(localVarQueryParams, "pageSize", r.pageSize, "form", "")
 	} else {
 		var defaultValue int32 = 50
+		parameterAddToHeaderOrQuery(localVarQueryParams, "pageSize", defaultValue, "form", "")
 		r.pageSize = &defaultValue
 	}
 	if r.pageToken != nil {

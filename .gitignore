@@ -1,0 +1,5 @@
+.go_cache/
+pkg/
+bin/
+*.test
+*.out

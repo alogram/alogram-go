@@ -3,7 +3,7 @@ Payments Risk API
 
 API for detecting and scoring fraud for purchases, with lifecycle labeling and behavioral signals. v1 focuses on purchases only (`/risk/check`), with future account/session and KYC checks stubbed below. 
 
-API version: 0.1.6
+API version: 0.1.6-rc.2
 Contact: support@alogram.ai
 */
 
@@ -124,3 +124,5 @@ func (v *NullablePaymentRefundOutcome) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
+
+

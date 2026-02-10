@@ -1,113 +1,84 @@
-# Alogram Payrisk Go SDK
+# Alogram PayRisk SDK for Go
 
-The official Go client for the **Alogram Payments Risk API**. This SDK provides a robust, "smart" interface for checking fraud risk, ingesting behavioral signals, and managing payment lifecycle events.
+[![Go Reference](https://pkg.go.dev/badge/github.com/alogram/payrisk-go.svg)](https://pkg.go.dev/github.com/alogram/payrisk-go)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-**Key Features:**
-*   **Resilient:** Built-in retries with exponential backoff for transient errors.
-*   **Traceable:** Automatic injection of `x-trace-id` and `x-idempotency-key` for every request.
-*   **Observable:** First-class support for **OpenTelemetry** spans and attributes.
-*   **Type-Safe:** Fully typed request/response models.
-*   **Secure:** Built-in webhook signature verification.
+The official Alogram PayRisk 'Smart' SDK for Go. Engineered for high-performance financial systems that demand strict type safety, context-aware operations, and native observability.
 
----
+## Features
 
-## 🏗️ Installation
+-   **🏢 Smart Client Architecture**: Specialized `AlogramRiskClient` (Secret) and `AlogramPublicClient` (Public) types.
+-   **🛡️ Automated Identity**: Automatic injection of `x-api-key`, `Authorization`, and tenant context.
+-   **🔄 Built-in Resiliency**: Idiomatic retries with configurable timeouts.
+-   **🕵️ OpenTelemetry Native**: Integrated tracing via `go.opentelemetry.io/otel`.
+-   **🧩 Type Safe**: Strongly-typed requests and responses using standard Go idioms.
+
+## Installation
 
 ```bash
 go get github.com/alogram/payrisk-go
 ```
 
----
+## Quick Start
 
-## 🚀 Quickstart
+### Evaluate Risk (Server-Side)
 
-### 1. Initialize the Client
-
-```go
-import "github.com/alogram/payrisk-go"
-
-client := alogram.NewAlogramRiskClient(alogram.ClientOptions{
-    BaseURL: "https://api.alogram.ai",
-    APIKey:  "sk_live_...",
-    TenantID: "your_tenant_id",
-})
-```
-
-### 2. Check Risk
+Use the `AlogramRiskClient` with your Secret Key (`sk_...`) to evaluate risk for a purchase.
 
 ```go
 package main
 
 import (
-    "context"
-    "fmt"
-    "github.com/alogram/payrisk-go"
-    "github.com/alogram/payrisk-go/internal/payrisk_v1"
+	"context"
+	"fmt"
+	"log"
+
+	"github.com/alogram/payrisk-go"
+	"github.com/alogram/payrisk-go/v1"
 )
 
 func main() {
-    client := alogram.NewAlogramRiskClient(alogram.ClientOptions{
-        BaseURL: "https://api.alogram.ai",
-        APIKey:  "sk_live_...",
-    })
+	// Initialize the smart client
+	client, err := alogram.NewAlogramRiskClient(alogram.ClientOptions{
+		APIKey:   "sk_live_your_secret_key",
+		TenantID: "tenant_123",
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
 
-    req := payrisk_v1.CheckRequest{
-        EventType: "purchase",
-        Entities: &payrisk_v1.EntityIds{
-            TenantId: "tid_123",
-            ClientId: "cid_abc",
-        },
-        Purchase: &payrisk_v1.Purchase{
-            Amount:   99.00,
-            Currency: "USD",
-        },
-    }
+	// Build a risk check request
+	req := payrisk_v1.CheckRequest{
+		Purchase: &payrisk_v1.Purchase{
+			Amount:   99.99,
+			Currency: "USD",
+		},
+		Identity: &payrisk_v1.Identity{
+			Email: "customer@example.com",
+		},
+	}
 
-    decision, err := client.CheckRisk(context.Background(), req, "", "")
-    if err != nil {
-        fmt.Printf("Error: %v\n", err)
-        return
-    }
+	// Perform the check with context support and automatic retries
+	decision, err := client.CheckRisk(context.Background(), req, "", "")
+	if err != nil {
+		log.Fatal(err)
+	}
 
-    fmt.Printf("Decision: %s | Score: %f\n", *decision.Decision, *decision.RiskScore)
+	fmt.Printf("Risk Decision: %s\n", decision.Decision)
 }
 ```
 
----
+## Scoped Authentication
 
-## 📊 Observability (OpenTelemetry)
+Alogram enforces strict key scoping at the type level:
 
-The SDK uses the standard OpenTelemetry Go API. It automatically detects and uses any configured Global Tracer.
+-   **`AlogramRiskClient`**: Requires a Secret Key (`sk_...`). Returns an error if initialized with a Publishable Key.
+-   **`AlogramPublicClient`**: Requires a Publishable Key (`pk_...`). Returns an error if initialized with a Secret Key.
 
-**Captured Attributes:**
-*   `alogram.idempotency_key`
-*   `alogram.trace_id`
-*   `alogram.decision`
+## Documentation
 
----
+For full API reference, visit [developers.alogram.ai](https://developers.alogram.ai).
 
-## 🛡️ Webhook Security
+## License
 
-Verify incoming webhooks using the built-in `WebhookVerifier`.
-
-```go
-verifier := alogram.WebhookVerifier{}
-isValid, err := verifier.Verify(payloadBytes, signatureHeader, webhookSecret)
-```
-
----
-
-## ⚠️ Error Handling
-
-| Exception | Description |
-| :--- | :--- |
-| `AuthenticationError` | Invalid API Key or Permissions. |
-| `ValidationError` | Invalid request body or missing fields. |
-| `RateLimitError` | Too many requests. **Automatically Retried.** |
-| `InternalServerError` | Server-side issues. **Automatically Retried.** |
-
----
-
-## 📦 License
-
-Apache 2.0
+Apache License 2.0. See [LICENSE](LICENSE) for details.

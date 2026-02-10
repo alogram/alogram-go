@@ -3,7 +3,7 @@ Payments Risk API
 
 API for detecting and scoring fraud for purchases, with lifecycle labeling and behavioral signals. v1 focuses on purchases only (`/risk/check`), with future account/session and KYC checks stubbed below. 
 
-API version: 0.1.6-rc.2
+API version: 0.1.6-rc.3
 Contact: support@alogram.ai
 */
 
@@ -43,7 +43,7 @@ var (
 	queryDescape    = strings.NewReplacer( "%5B", "[", "%5D", "]" )
 )
 
-// APIClient manages communication with the Payments Risk API API v0.1.6-rc.2
+// APIClient manages communication with the Payments Risk API API v0.1.6-rc.3
 // In most cases there should be only one, shared, APIClient.
 type APIClient struct {
 	cfg    *Configuration

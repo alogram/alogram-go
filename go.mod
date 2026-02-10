@@ -1,4 +1,4 @@
-module github.com/alogram/payrisk-go
+module github.com/alogram/alogram-go
 
 go 1.24.0
 

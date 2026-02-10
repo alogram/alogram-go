@@ -11,7 +11,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/alogram/payrisk-go/internal/payrisk_v1"
+	"github.com/alogram/alogram-go/internal/payrisk_v1"
 )
 
 func buildValidRequest() payrisk_v1.CheckRequest {

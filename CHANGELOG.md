@@ -3,22 +3,14 @@
 All notable changes to the Alogram PayRisk Go SDK will be documented in this file.
 
 ## [0.1.6-rc.3] - 2026-02-10
+- Hardened MockRiskClient with thread-safe mock decisions.
+- Unified production API defaults across all clients.
+- Added comprehensive AI Agent integration instructions.
+- Standardized project-local build caches for hermetic testing.
 
-### Added
-- Standardized "Smart" client architecture with hand-written façade.
-- Resilient retry logic (429 & 5xx) with exponential backoff and jitter.
-- Context-aware methods for all risk operations.
-- Native OpenTelemetry support for spans and attributes.
-
-### Changed
-- Optimized `net/http` transport configuration for production keep-alives.
+## [0.1.6-rc.2] - 2026-02-10
 - Synchronized with Payments Risk API v0.1.6-rc.3.
+- Enhanced README with premium documentation sections.
 
-## [0.1.6-rc.1] - 2026-02-10
-
-### Added
-- Built-in retry loop for transient failures (Rate Limits, Server Errors).
-- OpenTelemetry integration for tracing risk decisions.
-
-### Changed
-- Synchronized with Payments Risk API v0.1.6.
+## [0.1.6-rc.3] - 2026-02-09
+- Initial release candidate.

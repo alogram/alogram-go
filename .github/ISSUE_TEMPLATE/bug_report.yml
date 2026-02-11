@@ -1,0 +1,59 @@
+name: 🐛 Bug Report
+description: Report a bug to help us improve the Alogram SDK.
+title: "[BUG]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+  - type: input
+    id: sdk_version
+    attributes:
+      label: SDK Version
+      description: What version of the SDK are you using? (e.g., v0.1.6-rc.7)
+      placeholder: vX.Y.Z
+    validations:
+      required: true
+  - type: dropdown
+    id: runtime
+    attributes:
+      label: Runtime / Environment
+      options:
+        - Node.js (TypeScript/JS)
+        - Python
+        - Go
+        - Java (JVM)
+        - Android (Kotlin)
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: describe_bug
+    attributes:
+      label: Describe the bug
+      description: A clear and concise description of what the bug is.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction Steps
+      description: Steps to reproduce the behavior.
+      placeholder: |
+        1. Initialize client with...
+        2. Call method X...
+        3. See error...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: A clear and concise description of what you expected to happen.
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant Logs / Output
+      description: Please paste any relevant error messages or stack traces.
+      render: shell

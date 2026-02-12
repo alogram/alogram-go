@@ -18,7 +18,7 @@ import (
 // checks if the EntityIds type satisfies the MappedNullable interface at compile time
 var _ MappedNullable = &EntityIds{}
 
-// EntityIds Canonical entity identifiers (tenant/client/user/device/session). Do not send raw PII. Hash emails/phones/addresses as sha256 and prefix with 'sha256_'. Tiered support:   - tenantId is the top-level SaaS customer (required for all flows).   - clientId is the tenant’s downstream business customer (e.g. merchant/partner) and MAY be omitted for     processor / bank / PSP-style integrations.   - endCustomerId is the tenant/client’s consumer or business account (cardholder, shopper, etc.) and     MAY be omitted for purely device- or instrument-level checks. 
+// EntityIds Canonical entity identifiers (tenant/client/user/device/session). Do not send raw PII. Hash emails/phones/addresses as sha256 and prefix with 'sha256_'. Tiered support:   - tenantId is the top-level SaaS customer (required for all flows).   - clientId is the tenant's downstream business customer (e.g. merchant/partner) and MAY be omitted for     processor / bank / PSP-style integrations.   - endCustomerId is the tenant/client's consumer or business account (cardholder, shopper, etc.) and     MAY be omitted for purely device- or instrument-level checks. 
 type EntityIds struct {
 	// Canonical ID for the paying organization (Tenant). Opaque, immutable, lowercase.  Must start with \"tid_\". Do not use domains or emails here. For a tenant's domain,  use a separate field (e.g., tenantDomain). 
 	TenantId *string `json:"tenantId,omitempty" validate:"regexp=^tid_[a-z0-9_-]{2,60}$"`

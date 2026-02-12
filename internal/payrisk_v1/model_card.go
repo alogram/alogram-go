@@ -26,7 +26,7 @@ type Card struct {
 	Type string `json:"type"`
 	CardNetwork *CardNetworkEnum `json:"cardNetwork,omitempty"`
 	CardType *PaymentCardTypeEnum `json:"cardType,omitempty"`
-	// Bank Identification Number (IIN). First 6–8 digits of the PAN; do not send full PAN.
+	// Bank Identification Number (IIN). First 6-8 digits of the PAN; do not send full PAN.
 	Bin *string `json:"bin,omitempty" validate:"regexp=^[0-9]{6,8}$"`
 	// ISO 3166-1 alpha-2 country code.
 	IssuerCountry *string `json:"issuerCountry,omitempty" validate:"regexp=^[A-Z]{2}$"`

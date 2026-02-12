@@ -26,10 +26,7 @@ type PaymentOutcome struct {
 	Dispute *PaymentDisputeOutcome `json:"dispute,omitempty"`
 	Chargeback *PaymentChargeback `json:"chargeback,omitempty"`
 	ChargebackOutcome *PaymentChargebackOutcome `json:"chargebackOutcome,omitempty"`
-	AdditionalProperties map[string]interface{}
 }
-
-type _PaymentOutcome PaymentOutcome
 
 // NewPaymentOutcome instantiates a new PaymentOutcome object
 // This constructor will assign default values to properties that have it defined,
@@ -268,38 +265,7 @@ func (o PaymentOutcome) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.ChargebackOutcome) {
 		toSerialize["chargebackOutcome"] = o.ChargebackOutcome
 	}
-
-	for key, value := range o.AdditionalProperties {
-		toSerialize[key] = value
-	}
-
 	return toSerialize, nil
-}
-
-func (o *PaymentOutcome) UnmarshalJSON(data []byte) (err error) {
-	varPaymentOutcome := _PaymentOutcome{}
-
-	err = json.Unmarshal(data, &varPaymentOutcome)
-
-	if err != nil {
-		return err
-	}
-
-	*o = PaymentOutcome(varPaymentOutcome)
-
-	additionalProperties := make(map[string]interface{})
-
-	if err = json.Unmarshal(data, &additionalProperties); err == nil {
-		delete(additionalProperties, "authorization")
-		delete(additionalProperties, "capture")
-		delete(additionalProperties, "refund")
-		delete(additionalProperties, "dispute")
-		delete(additionalProperties, "chargeback")
-		delete(additionalProperties, "chargebackOutcome")
-		o.AdditionalProperties = additionalProperties
-	}
-
-	return err
 }
 
 type NullablePaymentOutcome struct {

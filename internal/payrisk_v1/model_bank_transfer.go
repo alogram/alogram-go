@@ -1,9 +1,9 @@
 /*
-Payments Risk API
+Alogram PayRisk Engine
 
-API for detecting and scoring fraud for purchases, with lifecycle labeling and behavioral signals. v1 focuses on purchases only (`/risk/check`), with future account/session and KYC checks stubbed below. 
+Alogram PayRisk is a decision management and risk orchestration engine  for global commerce. It fuses adaptive machine learning, behavioral  analytics, and deterministic business rules into a high-fidelity scoring  pipeline designed for enterprise scale and auditability. Key capabilities  include real-time risk scoring, advanced behavioral fingerprinting,  geographic triangulation, and forensic decision transparency. 
 
-API version: 0.1.6-rc.3
+API version: 0.2.8
 Contact: support@alogram.ai
 */
 
@@ -20,7 +20,7 @@ import (
 // checks if the BankTransfer type satisfies the MappedNullable interface at compile time
 var _ MappedNullable = &BankTransfer{}
 
-// BankTransfer struct for BankTransfer
+// BankTransfer Traditional bank transfer (e.g., ACH, SEPA Credit Transfer); keep payload minimal.
 type BankTransfer struct {
 	// Fixed to `bank_transfer` for this schema.
 	Type string `json:"type"`

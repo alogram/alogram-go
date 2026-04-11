@@ -1,9 +1,9 @@
 /*
-Payments Risk API
+Alogram PayRisk Engine
 
-API for detecting and scoring fraud for purchases, with lifecycle labeling and behavioral signals. v1 focuses on purchases only (`/risk/check`), with future account/session and KYC checks stubbed below. 
+Alogram PayRisk is a decision management and risk orchestration engine  for global commerce. It fuses adaptive machine learning, behavioral  analytics, and deterministic business rules into a high-fidelity scoring  pipeline designed for enterprise scale and auditability. Key capabilities  include real-time risk scoring, advanced behavioral fingerprinting,  geographic triangulation, and forensic decision transparency. 
 
-API version: 0.1.6-rc.3
+API version: 0.2.8
 Contact: support@alogram.ai
 */
 
@@ -29,6 +29,8 @@ type CheckRequest struct {
 	Entities EntityIds `json:"entities"`
 	Purchase Purchase `json:"purchase"`
 	Identity *Identity `json:"identity,omitempty"`
+	// Optional 3rd party risk assessments (e.g. Shopify, Stripe, Signifyd).
+	ExternalAssessments []ExternalAssessment `json:"externalAssessments,omitempty"`
 }
 
 type _CheckRequest CheckRequest
@@ -200,6 +202,38 @@ func (o *CheckRequest) SetIdentity(v Identity) {
 	o.Identity = &v
 }
 
+// GetExternalAssessments returns the ExternalAssessments field value if set, zero value otherwise.
+func (o *CheckRequest) GetExternalAssessments() []ExternalAssessment {
+	if o == nil || IsNil(o.ExternalAssessments) {
+		var ret []ExternalAssessment
+		return ret
+	}
+	return o.ExternalAssessments
+}
+
+// GetExternalAssessmentsOk returns a tuple with the ExternalAssessments field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *CheckRequest) GetExternalAssessmentsOk() ([]ExternalAssessment, bool) {
+	if o == nil || IsNil(o.ExternalAssessments) {
+		return nil, false
+	}
+	return o.ExternalAssessments, true
+}
+
+// HasExternalAssessments returns a boolean if a field has been set.
+func (o *CheckRequest) HasExternalAssessments() bool {
+	if o != nil && !IsNil(o.ExternalAssessments) {
+		return true
+	}
+
+	return false
+}
+
+// SetExternalAssessments gets a reference to the given []ExternalAssessment and assigns it to the ExternalAssessments field.
+func (o *CheckRequest) SetExternalAssessments(v []ExternalAssessment) {
+	o.ExternalAssessments = v
+}
+
 func (o CheckRequest) MarshalJSON() ([]byte, error) {
 	toSerialize,err := o.ToMap()
 	if err != nil {
@@ -220,6 +254,9 @@ func (o CheckRequest) ToMap() (map[string]interface{}, error) {
 	toSerialize["purchase"] = o.Purchase
 	if !IsNil(o.Identity) {
 		toSerialize["identity"] = o.Identity
+	}
+	if !IsNil(o.ExternalAssessments) {
+		toSerialize["externalAssessments"] = o.ExternalAssessments
 	}
 	return toSerialize, nil
 }

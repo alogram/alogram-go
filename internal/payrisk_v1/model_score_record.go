@@ -1,9 +1,9 @@
 /*
-Payments Risk API
+Alogram PayRisk Engine
 
-API for detecting and scoring fraud for purchases, with lifecycle labeling and behavioral signals. v1 focuses on purchases only (`/risk/check`), with future account/session and KYC checks stubbed below. 
+Alogram PayRisk is a decision management and risk orchestration engine  for global commerce. It fuses adaptive machine learning, behavioral  analytics, and deterministic business rules into a high-fidelity scoring  pipeline designed for enterprise scale and auditability. Key capabilities  include real-time risk scoring, advanced behavioral fingerprinting,  geographic triangulation, and forensic decision transparency. 
 
-API version: 0.1.6-rc.3
+API version: 0.2.8
 Contact: support@alogram.ai
 */
 
@@ -30,8 +30,10 @@ type ScoreRecord struct {
 	DecisionAt string `json:"decisionAt" validate:"regexp=^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}(\\\\.\\\\d{1,9})?(Z|[+-]\\\\d{2}:\\\\d{2})$"`
 	// The synchronous risk decision for a purchase.
 	Decision string `json:"decision"`
-	// Fraud risk score (0.00 - 1.00).
+	// DEPRECATED: Use decisionScore instead. Fraud risk score (0.00 - 1.00).
 	RiskScore float32 `json:"riskScore"`
+	// The authoritative blended risk score (0.0 - 1.0) derived from expert fusion.
+	DecisionScore float32 `json:"decisionScore"`
 	FraudScore *FraudScore `json:"fraudScore,omitempty"`
 	Breakdown *RiskBreakdown `json:"breakdown,omitempty"`
 	// Structured reason details for the score.
@@ -49,12 +51,13 @@ type _ScoreRecord ScoreRecord
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewScoreRecord(assessmentId string, decisionAt string, decision string, riskScore float32) *ScoreRecord {
+func NewScoreRecord(assessmentId string, decisionAt string, decision string, riskScore float32, decisionScore float32) *ScoreRecord {
 	this := ScoreRecord{}
 	this.AssessmentId = assessmentId
 	this.DecisionAt = decisionAt
 	this.Decision = decision
 	this.RiskScore = riskScore
+	this.DecisionScore = decisionScore
 	return &this
 }
 
@@ -192,6 +195,30 @@ func (o *ScoreRecord) GetRiskScoreOk() (*float32, bool) {
 // SetRiskScore sets field value
 func (o *ScoreRecord) SetRiskScore(v float32) {
 	o.RiskScore = v
+}
+
+// GetDecisionScore returns the DecisionScore field value
+func (o *ScoreRecord) GetDecisionScore() float32 {
+	if o == nil {
+		var ret float32
+		return ret
+	}
+
+	return o.DecisionScore
+}
+
+// GetDecisionScoreOk returns a tuple with the DecisionScore field value
+// and a boolean to check if the value has been set.
+func (o *ScoreRecord) GetDecisionScoreOk() (*float32, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.DecisionScore, true
+}
+
+// SetDecisionScore sets field value
+func (o *ScoreRecord) SetDecisionScore(v float32) {
+	o.DecisionScore = v
 }
 
 // GetFraudScore returns the FraudScore field value if set, zero value otherwise.
@@ -403,6 +430,7 @@ func (o ScoreRecord) ToMap() (map[string]interface{}, error) {
 	toSerialize["decisionAt"] = o.DecisionAt
 	toSerialize["decision"] = o.Decision
 	toSerialize["riskScore"] = o.RiskScore
+	toSerialize["decisionScore"] = o.DecisionScore
 	if !IsNil(o.FraudScore) {
 		toSerialize["fraudScore"] = o.FraudScore
 	}
@@ -433,6 +461,7 @@ func (o *ScoreRecord) UnmarshalJSON(data []byte) (err error) {
 		"decisionAt",
 		"decision",
 		"riskScore",
+		"decisionScore",
 	}
 
 	allProperties := make(map[string]interface{})

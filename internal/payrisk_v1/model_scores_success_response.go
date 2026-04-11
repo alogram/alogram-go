@@ -1,9 +1,9 @@
 /*
-Payments Risk API
+Alogram PayRisk Engine
 
-API for detecting and scoring fraud for purchases, with lifecycle labeling and behavioral signals. v1 focuses on purchases only (`/risk/check`), with future account/session and KYC checks stubbed below. 
+Alogram PayRisk is a decision management and risk orchestration engine  for global commerce. It fuses adaptive machine learning, behavioral  analytics, and deterministic business rules into a high-fidelity scoring  pipeline designed for enterprise scale and auditability. Key capabilities  include real-time risk scoring, advanced behavioral fingerprinting,  geographic triangulation, and forensic decision transparency. 
 
-API version: 0.1.6-rc.3
+API version: 0.2.8
 Contact: support@alogram.ai
 */
 
@@ -13,6 +13,8 @@ package payrisk_v1
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the ScoresSuccessResponse type satisfies the MappedNullable interface at compile time
@@ -21,17 +23,20 @@ var _ MappedNullable = &ScoresSuccessResponse{}
 // ScoresSuccessResponse List of fraud scores for a customer.
 type ScoresSuccessResponse struct {
 	// Score records within the requested window.
-	Scores []ScoreRecord `json:"scores,omitempty"`
+	Scores []ScoreRecord `json:"scores"`
 	// A token for retrieving the next page of results.
 	NextPageToken *string `json:"nextPageToken,omitempty"`
 }
+
+type _ScoresSuccessResponse ScoresSuccessResponse
 
 // NewScoresSuccessResponse instantiates a new ScoresSuccessResponse object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewScoresSuccessResponse() *ScoresSuccessResponse {
+func NewScoresSuccessResponse(scores []ScoreRecord) *ScoresSuccessResponse {
 	this := ScoresSuccessResponse{}
+	this.Scores = scores
 	return &this
 }
 
@@ -43,34 +48,26 @@ func NewScoresSuccessResponseWithDefaults() *ScoresSuccessResponse {
 	return &this
 }
 
-// GetScores returns the Scores field value if set, zero value otherwise.
+// GetScores returns the Scores field value
 func (o *ScoresSuccessResponse) GetScores() []ScoreRecord {
-	if o == nil || IsNil(o.Scores) {
+	if o == nil {
 		var ret []ScoreRecord
 		return ret
 	}
+
 	return o.Scores
 }
 
-// GetScoresOk returns a tuple with the Scores field value if set, nil otherwise
+// GetScoresOk returns a tuple with the Scores field value
 // and a boolean to check if the value has been set.
 func (o *ScoresSuccessResponse) GetScoresOk() ([]ScoreRecord, bool) {
-	if o == nil || IsNil(o.Scores) {
+	if o == nil {
 		return nil, false
 	}
 	return o.Scores, true
 }
 
-// HasScores returns a boolean if a field has been set.
-func (o *ScoresSuccessResponse) HasScores() bool {
-	if o != nil && !IsNil(o.Scores) {
-		return true
-	}
-
-	return false
-}
-
-// SetScores gets a reference to the given []ScoreRecord and assigns it to the Scores field.
+// SetScores sets field value
 func (o *ScoresSuccessResponse) SetScores(v []ScoreRecord) {
 	o.Scores = v
 }
@@ -117,13 +114,48 @@ func (o ScoresSuccessResponse) MarshalJSON() ([]byte, error) {
 
 func (o ScoresSuccessResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	if !IsNil(o.Scores) {
-		toSerialize["scores"] = o.Scores
-	}
+	toSerialize["scores"] = o.Scores
 	if !IsNil(o.NextPageToken) {
 		toSerialize["nextPageToken"] = o.NextPageToken
 	}
 	return toSerialize, nil
+}
+
+func (o *ScoresSuccessResponse) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"scores",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varScoresSuccessResponse := _ScoresSuccessResponse{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varScoresSuccessResponse)
+
+	if err != nil {
+		return err
+	}
+
+	*o = ScoresSuccessResponse(varScoresSuccessResponse)
+
+	return err
 }
 
 type NullableScoresSuccessResponse struct {

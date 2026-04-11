@@ -3,15 +3,25 @@
 [![Go Reference](https://pkg.go.dev/badge/github.com/alogram/alogram-go.svg)](https://pkg.go.dev/github.com/alogram/alogram-go)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-The official Alogram PayRisk 'Smart' SDK for Go. Engineered for high-throughput financial systems requiring context-aware resiliency, native observability, and ergonomic risk intelligence.
+The official Go client for the **Alogram PayRisk Engine**. 
+
+Alogram PayRisk is a decision management and risk orchestration engine for global commerce. It fuses machine learning, behavioral analytics, and deterministic business rules into a high-fidelity scoring pipeline designed for enterprise scale and auditability.
+
+## 🧠 The Three-Expert Architecture
+
+The SDK provides unified access to three specialized risk experts:
+
+-   **Risk Scoring**: Real-time assessment and decision orchestration for purchases.
+-   **Signal Intelligence**: Ingestion of behavioral telemetry and payment lifecycle events.
+-   **Forensic Data**: Deep visibility into historical assessments and decision transparency.
 
 ## 🚀 Features
 
 -   **🏢 Smart Client Architecture**: Specialized clients for server-side (`AlogramRiskClient`) and edge (`AlogramPublicClient`).
 -   **🛡️ Automated Identity**: Thread-safe injection of `x-api-key`, `Authorization`, and tenant headers.
--   **🔄 Built-in Resiliency**: Transparent exponential backoff and jittered retries (3 retries on 429/5xx).
--   **🕵️ OpenTelemetry Native**: Built-in tracing support for `context.Context` propagated risk decisions.
--   **🏗️ Go Idiomatic**: Uses standard `context.Context` for cancellation and timeouts.
+-   **🔄 Built-in Resiliency**: Automatic exponential backoff and jittered retries (3 retries on 429/5xx).
+-   **🕵️ Native Observability**: Built-in support for `context.Context` propagated OpenTelemetry tracing.
+-   **🏗️ Go Idiomatic**: Designed for high-concurrency systems using standard Go patterns.
 
 ## 📦 Installation
 
@@ -21,7 +31,9 @@ go get github.com/alogram/alogram-go
 
 ## 🛠️ Quick Start
 
-### Evaluate Risk (Server-Side)
+### Evaluate Risk (Risk Scoring Expert)
+
+Assess a purchase in real-time. This invokes the authoritative scoring pipeline.
 
 ```go
 import (
@@ -33,102 +45,75 @@ import (
 
 func main() {
     client, _ := alogram.NewAlogramRiskClient(alogram.ClientOptions{
-        APIKey: "sk_live_your_secret_key",
+        APIKey: "sk_live_...",
     })
 
     req := payrisk_v1.CheckRequest{
         Purchase: payrisk_v1.Purchase{Amount: 99.99, Currency: "USD"},
     }
 
-    decision, err := client.CheckRisk(context.Background(), req, "idk_123", "trc_123")
+    // Perform the check with automatic tracing and retries
+    decision, err := client.CheckRisk(context.Background(), req)
     if err != nil {
         panic(err)
     }
-    fmt.Printf("Decision: %s\n", decision.Decision)
+    
+    // Access the authoritative blended score
+    fmt.Printf("Decision: %s | Score: %.2f\n", decision.Decision, decision.DecisionScore)
 }
 ```
 
 ---
 
-## 🛡️ Error Handling
+## 🛡️ Error Handling & Resiliency
 
-Use `errors.As` to handle specific API error states:
+The SDK distinguishes between transient network issues and validation errors.
 
 ```go
 import "errors"
 
 decision, err := client.CheckRisk(...)
 if err != nil {
-    var rateLimitErr *alogram.RateLimitError
-    if errors.As(err, &rateLimitErr) {
-        // 🔄 Backoff is handled by SDK, but you can log here
-    }
-    
     var validationErr *alogram.ValidationError
     if errors.As(err, &validationErr) {
-        fmt.Println("Invalid input:", validationErr.Body)
+        // ❌ Handle invalid input (check validationErr.Body)
+    }
+    
+    var alogramErr *alogram.AlogramError
+    if errors.As(err, &alogramErr) {
+        // 🚨 Handle generic API or Auth errors
     }
 }
 ```
 
-## 🔑 Authentication & Keys
+## 🕵️ Observability (OpenTelemetry)
 
-Obtain your keys from the [Alogram Dashboard](https://dashboard.alogram.ai/keys).
+The SDK automatically integrates with OpenTelemetry if active in your `context.Context`.
 
-| Key Type | Prefix | Client | Use Case |
-| :--- | :--- | :--- | :--- |
-| **Secret Key** | `sk_live_...` | `AlogramRiskClient` | Server-side risk checks. **Never expose.** |
-| **Publishable Key** | `pk_live_...` | `AlogramPublicClient` | Frontend signals. |
+```go
+// Spans will automatically include 'alogram.decision' and 'alogram.trace_id'
+ctx, span := tracer.Start(ctx, "checkout")
+defer span.End()
 
-## 🤖 For AI Agents (Integration Context)
+decision, err := client.CheckRisk(ctx, request)
+```
 
-If you are using an AI agent (like ChatGPT, Claude, or Gemini), provide this context:
+## 🏗️ Environments
 
-> "I am integrating the Alogram PayRisk Go SDK. I need to call `CheckRisk` in my transaction handler. Use the `AlogramRiskClient`, handle `RateLimitError` gracefully, pass the request `context.Context` for tracing, and ensure you use the `idempotencyKey` parameter."
+| Environment | Base URL | Key Type |
+| :--- | :--- | :--- |
+| **Production** | `https://api.alogram.ai` | `sk_live_...` |
+| **Sandbox** | `https://api-sandbox.alogram.ai` | `sk_test_...` |
+| **Local** | `http://localhost:8080` | `test` |
 
 ---
 
-## 🧪 Local Testing & Mocking
+## 🤖 For AI Agents
 
-Use the thread-safe `MockRiskClient` for unit tests:
-
-```go
-mock := alogram.NewMockRiskClient()
-mock.QueueDecision("decline", 0.99, "high_risk_ip")
-
-decision, _ := myApp.Process(mock)
-fmt.Println(decision.Decision) // "decline"
-```
-
-## 🏗️ Environment Testing
-
-### Alogram Sandbox
-For safe integration testing, point your client to the Sandbox environment:
-```go
-client, _ := alogram.NewAlogramRiskClient(alogram.ClientOptions{
-    APIKey:  "sk_test_...",
-    BaseURL: "https://api-sandbox.alogram.ai",
-})
-```
-
-### Local Emulator
-For hermetic local testing, run the **Alogram Local Emulator**:
-```bash
-docker run -p 8080:8080 alogram/payrisk-emulator
-```
-Point your client to the local instance:
-```go
-client, _ := alogram.NewAlogramRiskClient(alogram.ClientOptions{
-    BaseURL: "http://localhost:8080",
-    APIKey:  "test",
-})
-```
+If using an AI agent (ChatGPT, Claude, Gemini) for integration, provide this context:
+> "Use the Alogram PayRisk Go SDK. Always prefer the `AlogramRiskClient` for backend operations. Pass the `context.Context` to all API calls for proper tracing. Access the authoritative blended score via the `DecisionScore` field of the response."
 
 ---
-
-## 📚 Documentation
-
-For the full API reference, visit [docs.alogram.ai](https://docs.alogram.ai).
 
 ## ⚖️ License
 

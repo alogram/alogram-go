@@ -1,9 +1,9 @@
 /*
-Payments Risk API
+Alogram PayRisk Engine
 
-API for detecting and scoring fraud for purchases, with lifecycle labeling and behavioral signals. v1 focuses on purchases only (`/risk/check`), with future account/session and KYC checks stubbed below. 
+Alogram PayRisk is a decision management and risk orchestration engine  for global commerce. It fuses adaptive machine learning, behavioral  analytics, and deterministic business rules into a high-fidelity scoring  pipeline designed for enterprise scale and auditability. Key capabilities  include real-time risk scoring, advanced behavioral fingerprinting,  geographic triangulation, and forensic decision transparency. 
 
-API version: 0.1.6-rc.3
+API version: 0.2.8
 Contact: support@alogram.ai
 */
 
@@ -25,6 +25,7 @@ const (
 	RISKCATEGORYENUM_IDENTITY RiskCategoryEnum = "identity"
 	RISKCATEGORYENUM_BEHAVIOR RiskCategoryEnum = "behavior"
 	RISKCATEGORYENUM_TRANSACTION RiskCategoryEnum = "transaction"
+	RISKCATEGORYENUM_NETWORK RiskCategoryEnum = "network"
 )
 
 // All allowed values of RiskCategoryEnum enum
@@ -33,6 +34,7 @@ var AllowedRiskCategoryEnumEnumValues = []RiskCategoryEnum{
 	"identity",
 	"behavior",
 	"transaction",
+	"network",
 }
 
 func (v *RiskCategoryEnum) UnmarshalJSON(src []byte) error {

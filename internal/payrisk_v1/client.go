@@ -1,9 +1,9 @@
 /*
-Payments Risk API
+Alogram PayRisk Engine
 
-API for detecting and scoring fraud for purchases, with lifecycle labeling and behavioral signals. v1 focuses on purchases only (`/risk/check`), with future account/session and KYC checks stubbed below. 
+Alogram PayRisk is a decision management and risk orchestration engine  for global commerce. It fuses adaptive machine learning, behavioral  analytics, and deterministic business rules into a high-fidelity scoring  pipeline designed for enterprise scale and auditability. Key capabilities  include real-time risk scoring, advanced behavioral fingerprinting,  geographic triangulation, and forensic decision transparency. 
 
-API version: 0.1.6-rc.3
+API version: 0.2.8
 Contact: support@alogram.ai
 */
 
@@ -43,7 +43,7 @@ var (
 	queryDescape    = strings.NewReplacer( "%5B", "[", "%5D", "]" )
 )
 
-// APIClient manages communication with the Payments Risk API API v0.1.6-rc.3
+// APIClient manages communication with the Alogram PayRisk Engine API v0.2.8
 // In most cases there should be only one, shared, APIClient.
 type APIClient struct {
 	cfg    *Configuration
@@ -51,7 +51,13 @@ type APIClient struct {
 
 	// API Services
 
+	ForensicDataAPI *ForensicDataAPIService
+
 	PayriskAPI *PayriskAPIService
+
+	RiskScoringAPI *RiskScoringAPIService
+
+	SignalIntelligenceAPI *SignalIntelligenceAPIService
 }
 
 type service struct {
@@ -70,7 +76,10 @@ func NewAPIClient(cfg *Configuration) *APIClient {
 	c.common.client = c
 
 	// API Services
+	c.ForensicDataAPI = (*ForensicDataAPIService)(&c.common)
 	c.PayriskAPI = (*PayriskAPIService)(&c.common)
+	c.RiskScoringAPI = (*RiskScoringAPIService)(&c.common)
+	c.SignalIntelligenceAPI = (*SignalIntelligenceAPIService)(&c.common)
 
 	return c
 }

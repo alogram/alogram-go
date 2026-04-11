@@ -1,9 +1,9 @@
 /*
-Payments Risk API
+Alogram PayRisk Engine
 
-API for detecting and scoring fraud for purchases, with lifecycle labeling and behavioral signals. v1 focuses on purchases only (`/risk/check`), with future account/session and KYC checks stubbed below. 
+Alogram PayRisk is a decision management and risk orchestration engine  for global commerce. It fuses adaptive machine learning, behavioral  analytics, and deterministic business rules into a high-fidelity scoring  pipeline designed for enterprise scale and auditability. Key capabilities  include real-time risk scoring, advanced behavioral fingerprinting,  geographic triangulation, and forensic decision transparency. 
 
-API version: 0.1.6-rc.3
+API version: 0.2.8
 Contact: support@alogram.ai
 */
 
@@ -24,6 +24,7 @@ type RiskBreakdown struct {
 	Identity *CategorySignal `json:"identity,omitempty"`
 	Behavior *CategorySignal `json:"behavior,omitempty"`
 	Transaction *CategorySignal `json:"transaction,omitempty"`
+	Network *CategorySignal `json:"network,omitempty"`
 }
 
 // NewRiskBreakdown instantiates a new RiskBreakdown object
@@ -171,6 +172,38 @@ func (o *RiskBreakdown) SetTransaction(v CategorySignal) {
 	o.Transaction = &v
 }
 
+// GetNetwork returns the Network field value if set, zero value otherwise.
+func (o *RiskBreakdown) GetNetwork() CategorySignal {
+	if o == nil || IsNil(o.Network) {
+		var ret CategorySignal
+		return ret
+	}
+	return *o.Network
+}
+
+// GetNetworkOk returns a tuple with the Network field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *RiskBreakdown) GetNetworkOk() (*CategorySignal, bool) {
+	if o == nil || IsNil(o.Network) {
+		return nil, false
+	}
+	return o.Network, true
+}
+
+// HasNetwork returns a boolean if a field has been set.
+func (o *RiskBreakdown) HasNetwork() bool {
+	if o != nil && !IsNil(o.Network) {
+		return true
+	}
+
+	return false
+}
+
+// SetNetwork gets a reference to the given CategorySignal and assigns it to the Network field.
+func (o *RiskBreakdown) SetNetwork(v CategorySignal) {
+	o.Network = &v
+}
+
 func (o RiskBreakdown) MarshalJSON() ([]byte, error) {
 	toSerialize,err := o.ToMap()
 	if err != nil {
@@ -192,6 +225,9 @@ func (o RiskBreakdown) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.Transaction) {
 		toSerialize["transaction"] = o.Transaction
+	}
+	if !IsNil(o.Network) {
+		toSerialize["network"] = o.Network
 	}
 	return toSerialize, nil
 }

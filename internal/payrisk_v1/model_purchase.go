@@ -1,9 +1,9 @@
 /*
-Payments Risk API
+Alogram PayRisk Engine
 
-API for detecting and scoring fraud for purchases, with lifecycle labeling and behavioral signals. v1 focuses on purchases only (`/risk/check`), with future account/session and KYC checks stubbed below. 
+Alogram PayRisk is a decision management and risk orchestration engine  for global commerce. It fuses adaptive machine learning, behavioral  analytics, and deterministic business rules into a high-fidelity scoring  pipeline designed for enterprise scale and auditability. Key capabilities  include real-time risk scoring, advanced behavioral fingerprinting,  geographic triangulation, and forensic decision transparency. 
 
-API version: 0.1.6-rc.3
+API version: 0.2.8
 Contact: support@alogram.ai
 */
 
@@ -37,6 +37,8 @@ type Purchase struct {
 	EntryMethod *EntryMethodEnum `json:"entryMethod,omitempty"`
 	PaymentMethod PaymentMethod `json:"paymentMethod"`
 	Order *OrderContext `json:"order,omitempty"`
+	// List of discount codes applied to the purchase.
+	Discounts []DiscountCode `json:"discounts,omitempty"`
 	PayerType *PayerTypeEnum `json:"payerType,omitempty"`
 	StoredCredential *StoredCredentialContext `json:"storedCredential,omitempty"`
 	Merchant *MerchantContext `json:"merchant,omitempty"`
@@ -366,6 +368,38 @@ func (o *Purchase) SetOrder(v OrderContext) {
 	o.Order = &v
 }
 
+// GetDiscounts returns the Discounts field value if set, zero value otherwise.
+func (o *Purchase) GetDiscounts() []DiscountCode {
+	if o == nil || IsNil(o.Discounts) {
+		var ret []DiscountCode
+		return ret
+	}
+	return o.Discounts
+}
+
+// GetDiscountsOk returns a tuple with the Discounts field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Purchase) GetDiscountsOk() ([]DiscountCode, bool) {
+	if o == nil || IsNil(o.Discounts) {
+		return nil, false
+	}
+	return o.Discounts, true
+}
+
+// HasDiscounts returns a boolean if a field has been set.
+func (o *Purchase) HasDiscounts() bool {
+	if o != nil && !IsNil(o.Discounts) {
+		return true
+	}
+
+	return false
+}
+
+// SetDiscounts gets a reference to the given []DiscountCode and assigns it to the Discounts field.
+func (o *Purchase) SetDiscounts(v []DiscountCode) {
+	o.Discounts = v
+}
+
 // GetPayerType returns the PayerType field value if set, zero value otherwise.
 func (o *Purchase) GetPayerType() PayerTypeEnum {
 	if o == nil || IsNil(o.PayerType) {
@@ -527,6 +561,9 @@ func (o Purchase) ToMap() (map[string]interface{}, error) {
 	toSerialize["paymentMethod"] = o.PaymentMethod
 	if !IsNil(o.Order) {
 		toSerialize["order"] = o.Order
+	}
+	if !IsNil(o.Discounts) {
+		toSerialize["discounts"] = o.Discounts
 	}
 	if !IsNil(o.PayerType) {
 		toSerialize["payerType"] = o.PayerType

@@ -1,9 +1,9 @@
 /*
-Payments Risk API
+Alogram PayRisk Engine
 
-API for detecting and scoring fraud for purchases, with lifecycle labeling and behavioral signals. v1 focuses on purchases only (`/risk/check`), with future account/session and KYC checks stubbed below. 
+Alogram PayRisk is a decision management and risk orchestration engine  for global commerce. It fuses adaptive machine learning, behavioral  analytics, and deterministic business rules into a high-fidelity scoring  pipeline designed for enterprise scale and auditability. Key capabilities  include real-time risk scoring, advanced behavioral fingerprinting,  geographic triangulation, and forensic decision transparency. 
 
-API version: 0.1.6-rc.3
+API version: 0.2.8
 Contact: support@alogram.ai
 */
 
@@ -28,6 +28,10 @@ type Identity struct {
 	Phone *string `json:"phone,omitempty" validate:"regexp=^\\\\+?[1-9][0-9 .\\\\-()]{6,14}[0-9]$"`
 	ShippingAddress *PostalAddress `json:"shippingAddress,omitempty"`
 	BillingAddress *PostalAddress `json:"billingAddress,omitempty"`
+	// Optional: Set to true if client-side bot detection (e.g. reCAPTCHA) triggered.
+	IsBot *bool `json:"isBot,omitempty"`
+	// Optional: Client-side assessment of email reputation.
+	EmailReputation *string `json:"emailReputation,omitempty"`
 }
 
 // NewIdentity instantiates a new Identity object
@@ -207,6 +211,70 @@ func (o *Identity) SetBillingAddress(v PostalAddress) {
 	o.BillingAddress = &v
 }
 
+// GetIsBot returns the IsBot field value if set, zero value otherwise.
+func (o *Identity) GetIsBot() bool {
+	if o == nil || IsNil(o.IsBot) {
+		var ret bool
+		return ret
+	}
+	return *o.IsBot
+}
+
+// GetIsBotOk returns a tuple with the IsBot field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Identity) GetIsBotOk() (*bool, bool) {
+	if o == nil || IsNil(o.IsBot) {
+		return nil, false
+	}
+	return o.IsBot, true
+}
+
+// HasIsBot returns a boolean if a field has been set.
+func (o *Identity) HasIsBot() bool {
+	if o != nil && !IsNil(o.IsBot) {
+		return true
+	}
+
+	return false
+}
+
+// SetIsBot gets a reference to the given bool and assigns it to the IsBot field.
+func (o *Identity) SetIsBot(v bool) {
+	o.IsBot = &v
+}
+
+// GetEmailReputation returns the EmailReputation field value if set, zero value otherwise.
+func (o *Identity) GetEmailReputation() string {
+	if o == nil || IsNil(o.EmailReputation) {
+		var ret string
+		return ret
+	}
+	return *o.EmailReputation
+}
+
+// GetEmailReputationOk returns a tuple with the EmailReputation field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Identity) GetEmailReputationOk() (*string, bool) {
+	if o == nil || IsNil(o.EmailReputation) {
+		return nil, false
+	}
+	return o.EmailReputation, true
+}
+
+// HasEmailReputation returns a boolean if a field has been set.
+func (o *Identity) HasEmailReputation() bool {
+	if o != nil && !IsNil(o.EmailReputation) {
+		return true
+	}
+
+	return false
+}
+
+// SetEmailReputation gets a reference to the given string and assigns it to the EmailReputation field.
+func (o *Identity) SetEmailReputation(v string) {
+	o.EmailReputation = &v
+}
+
 func (o Identity) MarshalJSON() ([]byte, error) {
 	toSerialize,err := o.ToMap()
 	if err != nil {
@@ -231,6 +299,12 @@ func (o Identity) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.BillingAddress) {
 		toSerialize["billingAddress"] = o.BillingAddress
+	}
+	if !IsNil(o.IsBot) {
+		toSerialize["isBot"] = o.IsBot
+	}
+	if !IsNil(o.EmailReputation) {
+		toSerialize["emailReputation"] = o.EmailReputation
 	}
 	return toSerialize, nil
 }

@@ -1,9 +1,9 @@
 /*
-Payments Risk API
+Alogram PayRisk Engine
 
-API for detecting and scoring fraud for purchases, with lifecycle labeling and behavioral signals. v1 focuses on purchases only (`/risk/check`), with future account/session and KYC checks stubbed below. 
+Alogram PayRisk is a decision management and risk orchestration engine  for global commerce. It fuses adaptive machine learning, behavioral  analytics, and deterministic business rules into a high-fidelity scoring  pipeline designed for enterprise scale and auditability. Key capabilities  include real-time risk scoring, advanced behavioral fingerprinting,  geographic triangulation, and forensic decision transparency. 
 
-API version: 0.1.6-rc.3
+API version: 0.2.8
 Contact: support@alogram.ai
 */
 
@@ -93,34 +93,16 @@ type Configuration struct {
 func NewConfiguration() *Configuration {
 	cfg := &Configuration{
 		DefaultHeader:    make(map[string]string),
-		UserAgent:        "OpenAPI-Generator/0.1.6-rc.3/go",
+		UserAgent:        "OpenAPI-Generator/0.2.8/go",
 		Debug:            false,
 		Servers:          ServerConfigurations{
 			{
-				URL: "https://api-{environment}.alogram.ai/{version}",
-				Description: "Per-environment API gateway.",
-				Variables: map[string]ServerVariable{
-					"environment": ServerVariable{
-						Description: "No description provided",
-						DefaultValue: "dev",
-						EnumValues: []string{
-							"dev",
-							"nonprod",
-							"sandbox",
-						},
-					},
-					"version": ServerVariable{
-						Description: "No description provided",
-						DefaultValue: "v1",
-						EnumValues: []string{
-							"v1",
-						},
-					},
-				},
+				URL: "https://api.alogram.ai/v1",
+				Description: "Production Environment",
 			},
 			{
-				URL: "https://api.alogram.ai/v1",
-				Description: "Production API gateway v1.",
+				URL: "https://sandbox.api.alogram.ai/v1",
+				Description: "Sandbox Environment (for integration testing)",
 			},
 		},
 		OperationServers: map[string]ServerConfigurations{

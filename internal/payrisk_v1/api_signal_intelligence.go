@@ -20,82 +20,80 @@ import (
 )
 
 
-// PayriskAPIService PayriskAPI service
-type PayriskAPIService service
+// SignalIntelligenceAPIService SignalIntelligenceAPI service
+type SignalIntelligenceAPIService service
 
-type ApiAccountRiskCheckRequest struct {
+type ApiIngestPaymentEventRequest struct {
 	ctx context.Context
-	ApiService *PayriskAPIService
+	ApiService *SignalIntelligenceAPIService
 	xIdempotencyKey *string
-	accountCheckRequest *AccountCheckRequest
+	paymentEvent *PaymentEvent
 	xTraceId *string
 }
 
 // Unique Idempotency-Key sent in the POST request etc.
-func (r ApiAccountRiskCheckRequest) XIdempotencyKey(xIdempotencyKey string) ApiAccountRiskCheckRequest {
+func (r ApiIngestPaymentEventRequest) XIdempotencyKey(xIdempotencyKey string) ApiIngestPaymentEventRequest {
 	r.xIdempotencyKey = &xIdempotencyKey
 	return r
 }
 
-func (r ApiAccountRiskCheckRequest) AccountCheckRequest(accountCheckRequest AccountCheckRequest) ApiAccountRiskCheckRequest {
-	r.accountCheckRequest = &accountCheckRequest
+func (r ApiIngestPaymentEventRequest) PaymentEvent(paymentEvent PaymentEvent) ApiIngestPaymentEventRequest {
+	r.paymentEvent = &paymentEvent
 	return r
 }
 
 // Echoed or generated trace ID for tracking requests.
-func (r ApiAccountRiskCheckRequest) XTraceId(xTraceId string) ApiAccountRiskCheckRequest {
+func (r ApiIngestPaymentEventRequest) XTraceId(xTraceId string) ApiIngestPaymentEventRequest {
 	r.xTraceId = &xTraceId
 	return r
 }
 
-func (r ApiAccountRiskCheckRequest) Execute() (*DecisionResponse, *http.Response, error) {
-	return r.ApiService.AccountRiskCheckExecute(r)
+func (r ApiIngestPaymentEventRequest) Execute() (*http.Response, error) {
+	return r.ApiService.IngestPaymentEventExecute(r)
 }
 
 /*
-AccountRiskCheck Synchronous fraud decision for account/session events (signup, login, settings)
+IngestPaymentEvent Ingest Lifecycle Signals
 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiAccountRiskCheckRequest
+ @return ApiIngestPaymentEventRequest
 */
-func (a *PayriskAPIService) AccountRiskCheck(ctx context.Context) ApiAccountRiskCheckRequest {
-	return ApiAccountRiskCheckRequest{
+func (a *SignalIntelligenceAPIService) IngestPaymentEvent(ctx context.Context) ApiIngestPaymentEventRequest {
+	return ApiIngestPaymentEventRequest{
 		ApiService: a,
 		ctx: ctx,
 	}
 }
 
 // Execute executes the request
-//  @return DecisionResponse
-func (a *PayriskAPIService) AccountRiskCheckExecute(r ApiAccountRiskCheckRequest) (*DecisionResponse, *http.Response, error) {
+func (a *SignalIntelligenceAPIService) IngestPaymentEventExecute(r ApiIngestPaymentEventRequest) (*http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
 		localVarPostBody     interface{}
 		formFiles            []formFile
-		localVarReturnValue  *DecisionResponse
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "PayriskAPIService.AccountRiskCheck")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "SignalIntelligenceAPIService.IngestPaymentEvent")
 	if err != nil {
-		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+		return nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/v1/risk/account/check"
+	localVarPath := localBasePath + "/v1/events"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
 	if r.xIdempotencyKey == nil {
-		return localVarReturnValue, nil, reportError("xIdempotencyKey is required and must be specified")
+		return nil, reportError("xIdempotencyKey is required and must be specified")
 	}
 	if strlen(*r.xIdempotencyKey) < 36 {
-		return localVarReturnValue, nil, reportError("xIdempotencyKey must have at least 36 elements")
+		return nil, reportError("xIdempotencyKey must have at least 36 elements")
 	}
 	if strlen(*r.xIdempotencyKey) > 36 {
-		return localVarReturnValue, nil, reportError("xIdempotencyKey must have less than 36 elements")
+		return nil, reportError("xIdempotencyKey must have less than 36 elements")
 	}
-	if r.accountCheckRequest == nil {
-		return localVarReturnValue, nil, reportError("accountCheckRequest is required and must be specified")
+	if r.paymentEvent == nil {
+		return nil, reportError("paymentEvent is required and must be specified")
 	}
 
 	// to determine the Content-Type header
@@ -108,7 +106,7 @@ func (a *PayriskAPIService) AccountRiskCheckExecute(r ApiAccountRiskCheckRequest
 	}
 
 	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{"application/json", "application/problem+json"}
+	localVarHTTPHeaderAccepts := []string{"application/problem+json"}
 
 	// set Accept header
 	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
@@ -120,7 +118,7 @@ func (a *PayriskAPIService) AccountRiskCheckExecute(r ApiAccountRiskCheckRequest
 	}
 	parameterAddToHeaderOrQuery(localVarHeaderParams, "x-idempotency-key", r.xIdempotencyKey, "", "")
 	// body params
-	localVarPostBody = r.accountCheckRequest
+	localVarPostBody = r.paymentEvent
 	if r.ctx != nil {
 		// API Key Authentication
 		if auth, ok := r.ctx.Value(ContextAPIKeys).(map[string]APIKey); ok {
@@ -134,144 +132,6 @@ func (a *PayriskAPIService) AccountRiskCheckExecute(r ApiAccountRiskCheckRequest
 				localVarHeaderParams["x-api-key"] = key
 			}
 		}
-	}
-	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
-	if err != nil {
-		return localVarReturnValue, nil, err
-	}
-
-	localVarHTTPResponse, err := a.client.callAPI(req)
-	if err != nil || localVarHTTPResponse == nil {
-		return localVarReturnValue, localVarHTTPResponse, err
-	}
-
-	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
-	if err != nil {
-		return localVarReturnValue, localVarHTTPResponse, err
-	}
-
-	if localVarHTTPResponse.StatusCode >= 300 {
-		newErr := &GenericOpenAPIError{
-			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
-		}
-		if localVarHTTPResponse.StatusCode == 400 {
-			var v Problem
-			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-			if err != nil {
-				newErr.error = err.Error()
-				return localVarReturnValue, localVarHTTPResponse, newErr
-			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
-			return localVarReturnValue, localVarHTTPResponse, newErr
-		}
-		if localVarHTTPResponse.StatusCode == 422 {
-			var v Problem
-			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-			if err != nil {
-				newErr.error = err.Error()
-				return localVarReturnValue, localVarHTTPResponse, newErr
-			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
-			return localVarReturnValue, localVarHTTPResponse, newErr
-		}
-		if localVarHTTPResponse.StatusCode == 429 {
-			var v Problem
-			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-			if err != nil {
-				newErr.error = err.Error()
-				return localVarReturnValue, localVarHTTPResponse, newErr
-			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
-			return localVarReturnValue, localVarHTTPResponse, newErr
-		}
-		if localVarHTTPResponse.StatusCode == 500 {
-			var v Problem
-			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-			if err != nil {
-				newErr.error = err.Error()
-				return localVarReturnValue, localVarHTTPResponse, newErr
-			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
-		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
-	}
-
-	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-	if err != nil {
-		newErr := &GenericOpenAPIError{
-			body:  localVarBody,
-			error: err.Error(),
-		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
-	}
-
-	return localVarReturnValue, localVarHTTPResponse, nil
-}
-
-type ApiHealthCheckRequest struct {
-	ctx context.Context
-	ApiService *PayriskAPIService
-}
-
-func (r ApiHealthCheckRequest) Execute() (*http.Response, error) {
-	return r.ApiService.HealthCheckExecute(r)
-}
-
-/*
-HealthCheck Health check for the service
-
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiHealthCheckRequest
-*/
-func (a *PayriskAPIService) HealthCheck(ctx context.Context) ApiHealthCheckRequest {
-	return ApiHealthCheckRequest{
-		ApiService: a,
-		ctx: ctx,
-	}
-}
-
-// Execute executes the request
-func (a *PayriskAPIService) HealthCheckExecute(r ApiHealthCheckRequest) (*http.Response, error) {
-	var (
-		localVarHTTPMethod   = http.MethodGet
-		localVarPostBody     interface{}
-		formFiles            []formFile
-	)
-
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "PayriskAPIService.HealthCheck")
-	if err != nil {
-		return nil, &GenericOpenAPIError{error: err.Error()}
-	}
-
-	localVarPath := localBasePath + "/v1/health"
-
-	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := url.Values{}
-	localVarFormParams := url.Values{}
-
-	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{}
-
-	// set Content-Type header
-	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
-	if localVarHTTPContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
-	}
-
-	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{}
-
-	// set Accept header
-	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
@@ -295,85 +155,181 @@ func (a *PayriskAPIService) HealthCheckExecute(r ApiHealthCheckRequest) (*http.R
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
+		if localVarHTTPResponse.StatusCode == 400 {
+			var v Problem
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarHTTPResponse, newErr
+			}
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
+			return localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 401 {
+			var v Problem
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarHTTPResponse, newErr
+			}
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
+			return localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 403 {
+			var v Problem
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarHTTPResponse, newErr
+			}
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
+			return localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 404 {
+			var v Problem
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarHTTPResponse, newErr
+			}
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
+			return localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 409 {
+			var v Problem
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarHTTPResponse, newErr
+			}
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
+			return localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 413 {
+			var v Problem
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarHTTPResponse, newErr
+			}
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
+			return localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 422 {
+			var v Problem
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarHTTPResponse, newErr
+			}
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
+			return localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 429 {
+			var v Problem
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarHTTPResponse, newErr
+			}
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
+			return localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 500 {
+			var v Problem
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarHTTPResponse, newErr
+			}
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
+		}
 		return localVarHTTPResponse, newErr
 	}
 
 	return localVarHTTPResponse, nil
 }
 
-type ApiKycRiskCheckRequest struct {
+type ApiIngestSignalsRequest struct {
 	ctx context.Context
-	ApiService *PayriskAPIService
+	ApiService *SignalIntelligenceAPIService
 	xIdempotencyKey *string
-	kycCheckRequest *KycCheckRequest
+	signalsRequest *SignalsRequest
 	xTraceId *string
 }
 
 // Unique Idempotency-Key sent in the POST request etc.
-func (r ApiKycRiskCheckRequest) XIdempotencyKey(xIdempotencyKey string) ApiKycRiskCheckRequest {
+func (r ApiIngestSignalsRequest) XIdempotencyKey(xIdempotencyKey string) ApiIngestSignalsRequest {
 	r.xIdempotencyKey = &xIdempotencyKey
 	return r
 }
 
-func (r ApiKycRiskCheckRequest) KycCheckRequest(kycCheckRequest KycCheckRequest) ApiKycRiskCheckRequest {
-	r.kycCheckRequest = &kycCheckRequest
+func (r ApiIngestSignalsRequest) SignalsRequest(signalsRequest SignalsRequest) ApiIngestSignalsRequest {
+	r.signalsRequest = &signalsRequest
 	return r
 }
 
 // Echoed or generated trace ID for tracking requests.
-func (r ApiKycRiskCheckRequest) XTraceId(xTraceId string) ApiKycRiskCheckRequest {
+func (r ApiIngestSignalsRequest) XTraceId(xTraceId string) ApiIngestSignalsRequest {
 	r.xTraceId = &xTraceId
 	return r
 }
 
-func (r ApiKycRiskCheckRequest) Execute() (*DecisionResponse, *http.Response, error) {
-	return r.ApiService.KycRiskCheckExecute(r)
+func (r ApiIngestSignalsRequest) Execute() (*http.Response, error) {
+	return r.ApiService.IngestSignalsExecute(r)
 }
 
 /*
-KycRiskCheck Synchronous decision for KYC/identity verification
+IngestSignals Submit Behavioral Intelligence
 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiKycRiskCheckRequest
+ @return ApiIngestSignalsRequest
 */
-func (a *PayriskAPIService) KycRiskCheck(ctx context.Context) ApiKycRiskCheckRequest {
-	return ApiKycRiskCheckRequest{
+func (a *SignalIntelligenceAPIService) IngestSignals(ctx context.Context) ApiIngestSignalsRequest {
+	return ApiIngestSignalsRequest{
 		ApiService: a,
 		ctx: ctx,
 	}
 }
 
 // Execute executes the request
-//  @return DecisionResponse
-func (a *PayriskAPIService) KycRiskCheckExecute(r ApiKycRiskCheckRequest) (*DecisionResponse, *http.Response, error) {
+func (a *SignalIntelligenceAPIService) IngestSignalsExecute(r ApiIngestSignalsRequest) (*http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
 		localVarPostBody     interface{}
 		formFiles            []formFile
-		localVarReturnValue  *DecisionResponse
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "PayriskAPIService.KycRiskCheck")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "SignalIntelligenceAPIService.IngestSignals")
 	if err != nil {
-		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+		return nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/v1/risk/kyc/check"
+	localVarPath := localBasePath + "/v1/signals"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
 	if r.xIdempotencyKey == nil {
-		return localVarReturnValue, nil, reportError("xIdempotencyKey is required and must be specified")
+		return nil, reportError("xIdempotencyKey is required and must be specified")
 	}
 	if strlen(*r.xIdempotencyKey) < 36 {
-		return localVarReturnValue, nil, reportError("xIdempotencyKey must have at least 36 elements")
+		return nil, reportError("xIdempotencyKey must have at least 36 elements")
 	}
 	if strlen(*r.xIdempotencyKey) > 36 {
-		return localVarReturnValue, nil, reportError("xIdempotencyKey must have less than 36 elements")
+		return nil, reportError("xIdempotencyKey must have less than 36 elements")
 	}
-	if r.kycCheckRequest == nil {
-		return localVarReturnValue, nil, reportError("kycCheckRequest is required and must be specified")
+	if r.signalsRequest == nil {
+		return nil, reportError("signalsRequest is required and must be specified")
 	}
 
 	// to determine the Content-Type header
@@ -386,7 +342,7 @@ func (a *PayriskAPIService) KycRiskCheckExecute(r ApiKycRiskCheckRequest) (*Deci
 	}
 
 	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{"application/json", "application/problem+json"}
+	localVarHTTPHeaderAccepts := []string{"application/problem+json"}
 
 	// set Accept header
 	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
@@ -398,7 +354,7 @@ func (a *PayriskAPIService) KycRiskCheckExecute(r ApiKycRiskCheckRequest) (*Deci
 	}
 	parameterAddToHeaderOrQuery(localVarHeaderParams, "x-idempotency-key", r.xIdempotencyKey, "", "")
 	// body params
-	localVarPostBody = r.kycCheckRequest
+	localVarPostBody = r.signalsRequest
 	if r.ctx != nil {
 		// API Key Authentication
 		if auth, ok := r.ctx.Value(ContextAPIKeys).(map[string]APIKey); ok {
@@ -415,19 +371,19 @@ func (a *PayriskAPIService) KycRiskCheckExecute(r ApiKycRiskCheckRequest) (*Deci
 	}
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
-		return localVarReturnValue, nil, err
+		return nil, err
 	}
 
 	localVarHTTPResponse, err := a.client.callAPI(req)
 	if err != nil || localVarHTTPResponse == nil {
-		return localVarReturnValue, localVarHTTPResponse, err
+		return localVarHTTPResponse, err
 	}
 
 	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
 	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
-		return localVarReturnValue, localVarHTTPResponse, err
+		return localVarHTTPResponse, err
 	}
 
 	if localVarHTTPResponse.StatusCode >= 300 {
@@ -440,55 +396,57 @@ func (a *PayriskAPIService) KycRiskCheckExecute(r ApiKycRiskCheckRequest) (*Deci
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
-				return localVarReturnValue, localVarHTTPResponse, newErr
+				return localVarHTTPResponse, newErr
 			}
 					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 					newErr.model = v
-			return localVarReturnValue, localVarHTTPResponse, newErr
+			return localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 413 {
+			var v Problem
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarHTTPResponse, newErr
+			}
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
+			return localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 422 {
 			var v Problem
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
-				return localVarReturnValue, localVarHTTPResponse, newErr
+				return localVarHTTPResponse, newErr
 			}
 					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 					newErr.model = v
-			return localVarReturnValue, localVarHTTPResponse, newErr
+			return localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 429 {
 			var v Problem
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
-				return localVarReturnValue, localVarHTTPResponse, newErr
+				return localVarHTTPResponse, newErr
 			}
 					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 					newErr.model = v
-			return localVarReturnValue, localVarHTTPResponse, newErr
+			return localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 500 {
 			var v Problem
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
-				return localVarReturnValue, localVarHTTPResponse, newErr
+				return localVarHTTPResponse, newErr
 			}
 					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 					newErr.model = v
 		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
+		return localVarHTTPResponse, newErr
 	}
 
-	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-	if err != nil {
-		newErr := &GenericOpenAPIError{
-			body:  localVarBody,
-			error: err.Error(),
-		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
-	}
-
-	return localVarReturnValue, localVarHTTPResponse, nil
+	return localVarHTTPResponse, nil
 }

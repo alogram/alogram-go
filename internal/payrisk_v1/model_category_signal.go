@@ -1,9 +1,9 @@
 /*
-Payments Risk API
+Alogram PayRisk Engine
 
-API for detecting and scoring fraud for purchases, with lifecycle labeling and behavioral signals. v1 focuses on purchases only (`/risk/check`), with future account/session and KYC checks stubbed below. 
+Alogram PayRisk is a decision management and risk orchestration engine  for global commerce. It fuses adaptive machine learning, behavioral  analytics, and deterministic business rules into a high-fidelity scoring  pipeline designed for enterprise scale and auditability. Key capabilities  include real-time risk scoring, advanced behavioral fingerprinting,  geographic triangulation, and forensic decision transparency. 
 
-API version: 0.1.6-rc.3
+API version: 0.2.8
 Contact: support@alogram.ai
 */
 
@@ -27,6 +27,8 @@ type CategorySignal struct {
 	Score *float32 `json:"score,omitempty"`
 	// Specific reason codes for this category.
 	Reasons []string `json:"reasons,omitempty"`
+	// Derived evidence and enrichment data for this category.
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
 }
 
 type _CategorySignal CategorySignal
@@ -137,6 +139,38 @@ func (o *CategorySignal) SetReasons(v []string) {
 	o.Reasons = v
 }
 
+// GetMetadata returns the Metadata field value if set, zero value otherwise.
+func (o *CategorySignal) GetMetadata() map[string]interface{} {
+	if o == nil || IsNil(o.Metadata) {
+		var ret map[string]interface{}
+		return ret
+	}
+	return o.Metadata
+}
+
+// GetMetadataOk returns a tuple with the Metadata field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *CategorySignal) GetMetadataOk() (map[string]interface{}, bool) {
+	if o == nil || IsNil(o.Metadata) {
+		return map[string]interface{}{}, false
+	}
+	return o.Metadata, true
+}
+
+// HasMetadata returns a boolean if a field has been set.
+func (o *CategorySignal) HasMetadata() bool {
+	if o != nil && !IsNil(o.Metadata) {
+		return true
+	}
+
+	return false
+}
+
+// SetMetadata gets a reference to the given map[string]interface{} and assigns it to the Metadata field.
+func (o *CategorySignal) SetMetadata(v map[string]interface{}) {
+	o.Metadata = v
+}
+
 func (o CategorySignal) MarshalJSON() ([]byte, error) {
 	toSerialize,err := o.ToMap()
 	if err != nil {
@@ -153,6 +187,9 @@ func (o CategorySignal) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.Reasons) {
 		toSerialize["reasons"] = o.Reasons
+	}
+	if !IsNil(o.Metadata) {
+		toSerialize["metadata"] = o.Metadata
 	}
 	return toSerialize, nil
 }

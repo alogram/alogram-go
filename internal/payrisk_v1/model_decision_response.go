@@ -1,9 +1,9 @@
 /*
-Payments Risk API
+Alogram PayRisk Engine
 
-API for detecting and scoring fraud for purchases, with lifecycle labeling and behavioral signals. v1 focuses on purchases only (`/risk/check`), with future account/session and KYC checks stubbed below. 
+Alogram PayRisk is a decision management and risk orchestration engine  for global commerce. It fuses adaptive machine learning, behavioral  analytics, and deterministic business rules into a high-fidelity scoring  pipeline designed for enterprise scale and auditability. Key capabilities  include real-time risk scoring, advanced behavioral fingerprinting,  geographic triangulation, and forensic decision transparency. 
 
-API version: 0.1.6-rc.3
+API version: 0.2.8
 Contact: support@alogram.ai
 */
 
@@ -27,7 +27,10 @@ type DecisionResponse struct {
 	Decision string `json:"decision"`
 	// RFC 3339 timestamp with timezone.
 	DecisionAt string `json:"decisionAt" validate:"regexp=^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}(\\\\.\\\\d{1,9})?(Z|[+-]\\\\d{2}:\\\\d{2})$"`
+	// DEPRECATED: Use decisionScore instead. Current blended risk score.
 	RiskScore float32 `json:"riskScore"`
+	// The authoritative blended risk score (0.0 - 1.0) derived from expert fusion.
+	DecisionScore float32 `json:"decisionScore"`
 	FraudScore *FraudScore `json:"fraudScore,omitempty"`
 	Breakdown *RiskBreakdown `json:"breakdown,omitempty"`
 	// Technical reason codes for the decision.
@@ -51,12 +54,13 @@ type _DecisionResponse DecisionResponse
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewDecisionResponse(assessmentId string, decision string, decisionAt string, riskScore float32) *DecisionResponse {
+func NewDecisionResponse(assessmentId string, decision string, decisionAt string, riskScore float32, decisionScore float32) *DecisionResponse {
 	this := DecisionResponse{}
 	this.AssessmentId = assessmentId
 	this.Decision = decision
 	this.DecisionAt = decisionAt
 	this.RiskScore = riskScore
+	this.DecisionScore = decisionScore
 	return &this
 }
 
@@ -162,6 +166,30 @@ func (o *DecisionResponse) GetRiskScoreOk() (*float32, bool) {
 // SetRiskScore sets field value
 func (o *DecisionResponse) SetRiskScore(v float32) {
 	o.RiskScore = v
+}
+
+// GetDecisionScore returns the DecisionScore field value
+func (o *DecisionResponse) GetDecisionScore() float32 {
+	if o == nil {
+		var ret float32
+		return ret
+	}
+
+	return o.DecisionScore
+}
+
+// GetDecisionScoreOk returns a tuple with the DecisionScore field value
+// and a boolean to check if the value has been set.
+func (o *DecisionResponse) GetDecisionScoreOk() (*float32, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.DecisionScore, true
+}
+
+// SetDecisionScore sets field value
+func (o *DecisionResponse) SetDecisionScore(v float32) {
+	o.DecisionScore = v
 }
 
 // GetFraudScore returns the FraudScore field value if set, zero value otherwise.
@@ -466,6 +494,7 @@ func (o DecisionResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize["decision"] = o.Decision
 	toSerialize["decisionAt"] = o.DecisionAt
 	toSerialize["riskScore"] = o.RiskScore
+	toSerialize["decisionScore"] = o.DecisionScore
 	if !IsNil(o.FraudScore) {
 		toSerialize["fraudScore"] = o.FraudScore
 	}
@@ -505,6 +534,7 @@ func (o *DecisionResponse) UnmarshalJSON(data []byte) (err error) {
 		"decision",
 		"decisionAt",
 		"riskScore",
+		"decisionScore",
 	}
 
 	allProperties := make(map[string]interface{})

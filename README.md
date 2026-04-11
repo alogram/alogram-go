@@ -1,3 +1,7 @@
+<p align="center">
+  <img src=".github/assets/logo.png" width="200" alt="Alogram PayRisk Logo">
+</p>
+
 # Alogram PayRisk SDK for Go
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/alogram/alogram-go.svg)](https://pkg.go.dev/github.com/alogram/alogram-go)
@@ -59,7 +63,8 @@ func main() {
     }
     
     // Access the authoritative blended score
-    fmt.Printf("Decision: %s | Score: %.2f\n", decision.Decision, decision.DecisionScore)
+    fmt.Printf("Decision: %s | Score: %.2f
+", decision.Decision, decision.DecisionScore)
 }
 ```
 

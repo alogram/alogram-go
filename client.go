@@ -6,6 +6,7 @@ package alogram
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"io"
 	"math"
 	"math/rand"
@@ -29,6 +30,7 @@ type ClientOptions struct {
 	TenantID    string
 	ClientID    string
 	Debug       bool
+	HTTPClient  *http.Client
 }
 
 type baseClient struct {
@@ -41,6 +43,11 @@ type baseClient struct {
 func newBaseClient(opts ClientOptions) baseClient {
 	cfg := payrisk_v1.NewConfiguration()
 	cfg.Debug = opts.Debug
+	cfg.UserAgent = "OpenAPI-Generator/0.2.9/python"
+
+	if opts.HTTPClient != nil {
+		cfg.HTTPClient = opts.HTTPClient
+	}
 
 	baseURL := opts.BaseURL
 	if baseURL == "" {
@@ -175,6 +182,45 @@ func (c *AlogramRiskClient) CheckRisk(ctx context.Context, req payrisk_v1.CheckR
 	}
 
 	return nil, c.mapError(err, httpResp)
+}
+
+// WaitForReady performs a lightweight handshake to wake up any sleeping infrastructure.
+func (c *baseClient) WaitForReady(ctx context.Context, timeout time.Duration) error {
+	ctx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	fmt.Printf("⏳ Performing Go infrastructure handshake (timeout: %v)...\n", timeout)
+	attempt := 1
+
+	for {
+		// Use raw Execute() which only returns (*http.Response, error)
+		// and bypasses the JSON/Model validation layer.
+		resp, err := c.api.SystemAPI.HealthCheck(ctx).Execute()
+		
+		if err == nil && resp != nil && resp.StatusCode == http.StatusOK {
+			fmt.Println("✅ Infrastructure is READY.")
+			return nil
+		}
+
+		backoff := time.Duration(math.Pow(2, float64(attempt))) * time.Second
+		if backoff > 10*time.Second {
+			backoff = 10 * time.Second
+		}
+
+		select {
+		case <-ctx.Done():
+			fmt.Println("❌ Infrastructure handshake TIMEOUT.")
+			return ctx.Err()
+		case <-time.After(backoff):
+			fmt.Printf("⚠️ Handshake attempt %d failed. Retrying in %v...\n", attempt, backoff)
+			attempt++
+		}
+	}
+}
+
+// SetDefaultHeader adds a global header to all outgoing requests.
+func (c *baseClient) SetDefaultHeader(key, value string) {
+	c.cfg.AddDefaultHeader(key, value)
 }
 
 func (c *AlogramRiskClient) IngestSignals(ctx context.Context, req payrisk_v1.SignalsRequest, ik string, tid string) error {

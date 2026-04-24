@@ -25,7 +25,7 @@ func Test_Smoke_HealthCheck(t *testing.T) {
 	client := NewAPIClient(cfg)
 	ctx := context.Background()
 
-	resp, err := client.PayriskAPI.HealthCheck(ctx).Execute()
+	resp, err := client.SystemAPI.HealthCheck(ctx).Execute()
 	if err != nil {
 		t.Fatalf("HealthCheck error: %v", err)
 	}

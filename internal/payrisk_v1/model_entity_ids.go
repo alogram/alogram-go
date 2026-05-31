@@ -3,7 +3,7 @@ Alogram PayRisk Engine
 
 Alogram PayRisk is an AI-native decision engine built for the speed and  complexity of the modern commerce era. In a high-velocity world where  AI-driven threats evolve in milliseconds, Alogram provides the real-time  adaptability and forensic transparency needed to protect your ecosystem  with total confidence. We solve the challenge of balancing frictionless  growth with regulatory explainability, delivering instant, intelligent  risk orchestration at enterprise scale.  ---   ## Licensing & Terms   Our client libraries and API specifications are open-source under the **Apache License 2.0**  to ensure seamless integration into your tech stack.  Use of the Alogram PayRisk API service is proprietary and governed by our  [Terms of Service](https://alogram.ai/#tos) and your specific **Enterprise Agreement**,  if applicable.  To access the service, you must have: *   A valid Alogram API Key. *   An active subscription or signed Master Service Agreement.  Unauthorized use, including automated scraping or reverse engineering of the  scoring engine, is strictly prohibited.   ---   ## Support & Traceability   Every Alogram API response includes a unique **`x-trace-id`** header.  Please include this ID when contacting [packages@alogram.ai](mailto:packages@alogram.ai)  regarding specific transactions or errors.   ---   ## Specification   The authoritative OpenAPI specification for this version is available for download: **[Download openapi.yaml](https://developers.alogram.ai/openapi.yaml)** | **[Download openapi.json](https://developers.alogram.ai/openapi.json)** 
 
-API version: 0.2.10
+API version: 0.2.21
 Contact: packages@alogram.ai
 */
 
@@ -20,20 +20,26 @@ var _ MappedNullable = &EntityIds{}
 
 // EntityIds Canonical entity identifiers (tenant/client/user/device/session). Do not send raw PII. Hash emails/phones/addresses as sha256 and prefix with 'sha256_'. Tiered support:   - tenantId is the top-level SaaS customer (required for all flows).   - clientId is the tenant's downstream business customer (e.g. merchant/partner) and MAY be omitted for     processor / bank / PSP-style integrations.   - endCustomerId is the tenant/client's consumer or business account (cardholder, shopper, etc.) and     MAY be omitted for purely device- or instrument-level checks. 
 type EntityIds struct {
-	// Canonical ID for the paying organization (Tenant). Opaque, immutable, lowercase.  Must start with \"tid_\". Do not use domains or emails here. For a tenant's domain,  use a separate field (e.g., tenantDomain). 
-	TenantId *string `json:"tenantId,omitempty" validate:"regexp=^tid_[a-z0-9\\\\-_]{2,60}$"`
-	// Canonical ID for the Tenant’s business customer (e.g., merchant/partner).  Opaque, immutable, lowercase. Must start with 'cid_'. 
-	ClientId *string `json:"clientId,omitempty" validate:"regexp=^cid_[a-z0-9\\\\-_]{2,96}$"`
-	// Canonical ID for the client’s end user / consumer (account holder).  Opaque, immutable, lowercase. Must start with \"ecid_\".  Do not put PII (like emails or phone numbers) in this field. 
-	EndCustomerId *string `json:"endCustomerId,omitempty" validate:"regexp=^ecid_[a-z0-9\\\\-_]{2,96}$"`
-	// Canonical ID for a Tenant member/operator (employee/contractor) using the platform.  Opaque, immutable, lowercase. Must start with 'mid_'. 
-	MemberId *string `json:"memberId,omitempty" validate:"regexp=^mid_[a-z0-9\\\\-_]{2,96}$"`
+	// Canonical ID for the paying organization (Tenant). Opaque, immutable, lowercase.  Must start with \"tid_\" (Legacy) or \"ten_\" (Preferred). 
+	TenantId *string `json:"tenantId,omitempty" validate:"regexp=^(tid|ten)_[a-z0-9_-]{2,64}$"`
+	// Canonical ID for the Tenant’s business customer (e.g., merchant/partner).  Opaque, immutable, lowercase. Must start with \"cid_\" (Legacy) or \"cli_\" (Preferred). 
+	ClientId *string `json:"clientId,omitempty" validate:"regexp=^(cid|cli)_[a-z0-9_-]{2,96}$"`
+	// Canonical ID for the client’s end user / consumer (account holder).  Opaque, immutable, lowercase. Supports \"ecid_\" slugs (Legacy) or \"cus_\" hex (Preferred). 
+	EndCustomerId *string `json:"endCustomerId,omitempty" validate:"regexp=^(ecid_[a-z0-9\\\\-_]{2,96}|cus_[a-f0-9]{32})$"`
+	// Canonical ID for a Tenant Operator (staff/automation) holding membership in the platform.  Opaque, immutable, lowercase. Supports \"mid_\" slugs (Legacy) or \"op_\" hex (Preferred). 
+	OperatorId *string `json:"operatorId,omitempty" validate:"regexp=^(mid_[a-z0-9_-]{2,96}|op_[a-f0-9]{32})$"`
+	Auth *AuthContext `json:"auth,omitempty"`
+	// Canonical ID for a marketplace product edition or billing SKU.  Always follows the Fortress-36 (sku_ + 32 hex) format. 
+	SkuId *string `json:"skuId,omitempty" validate:"regexp=^sku_[a-f0-9]{32}$"`
+	// Human-readable identifier for a SKU, used for logic and feature checks. 
+	SkuHandle *string `json:"skuHandle,omitempty" validate:"regexp=^[a-z0-9\\\\-_]{2,64}$"`
 	// Tokenized instrument ID (non-PCI).
 	PaymentInstrumentId *string `json:"paymentInstrumentId,omitempty" validate:"regexp=^[a-zA-Z0-9\\\\-_:]{2,96}$"`
 	// Server-issued stable device token (device-level identifier). Should persist across sessions and logins on the same browser/device. 
 	DeviceId *string `json:"deviceId,omitempty" validate:"regexp=^did_[a-zA-Z0-9\\\\-_:]{2,96}$"`
 	// Application/user session identifier (login or checkout session). Typically rotates more frequently than deviceId and may be tied to authentication. 
 	SessionId *string `json:"sessionId,omitempty" validate:"regexp=^sid_[a-zA-Z0-9\\\\-_:]{2,96}$"`
+	Agent *AgentManifest `json:"agent,omitempty"`
 	// Normalized+lowercased email hash (e.g., sha256).
 	EmailHash *string `json:"emailHash,omitempty" validate:"regexp=^sha256_[0-9a-f]{64}$"`
 	// Normalized+lowercased email *domain* hash (e.g., sha256).
@@ -159,36 +165,132 @@ func (o *EntityIds) SetEndCustomerId(v string) {
 	o.EndCustomerId = &v
 }
 
-// GetMemberId returns the MemberId field value if set, zero value otherwise.
-func (o *EntityIds) GetMemberId() string {
-	if o == nil || IsNil(o.MemberId) {
+// GetOperatorId returns the OperatorId field value if set, zero value otherwise.
+func (o *EntityIds) GetOperatorId() string {
+	if o == nil || IsNil(o.OperatorId) {
 		var ret string
 		return ret
 	}
-	return *o.MemberId
+	return *o.OperatorId
 }
 
-// GetMemberIdOk returns a tuple with the MemberId field value if set, nil otherwise
+// GetOperatorIdOk returns a tuple with the OperatorId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *EntityIds) GetMemberIdOk() (*string, bool) {
-	if o == nil || IsNil(o.MemberId) {
+func (o *EntityIds) GetOperatorIdOk() (*string, bool) {
+	if o == nil || IsNil(o.OperatorId) {
 		return nil, false
 	}
-	return o.MemberId, true
+	return o.OperatorId, true
 }
 
-// HasMemberId returns a boolean if a field has been set.
-func (o *EntityIds) HasMemberId() bool {
-	if o != nil && !IsNil(o.MemberId) {
+// HasOperatorId returns a boolean if a field has been set.
+func (o *EntityIds) HasOperatorId() bool {
+	if o != nil && !IsNil(o.OperatorId) {
 		return true
 	}
 
 	return false
 }
 
-// SetMemberId gets a reference to the given string and assigns it to the MemberId field.
-func (o *EntityIds) SetMemberId(v string) {
-	o.MemberId = &v
+// SetOperatorId gets a reference to the given string and assigns it to the OperatorId field.
+func (o *EntityIds) SetOperatorId(v string) {
+	o.OperatorId = &v
+}
+
+// GetAuth returns the Auth field value if set, zero value otherwise.
+func (o *EntityIds) GetAuth() AuthContext {
+	if o == nil || IsNil(o.Auth) {
+		var ret AuthContext
+		return ret
+	}
+	return *o.Auth
+}
+
+// GetAuthOk returns a tuple with the Auth field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *EntityIds) GetAuthOk() (*AuthContext, bool) {
+	if o == nil || IsNil(o.Auth) {
+		return nil, false
+	}
+	return o.Auth, true
+}
+
+// HasAuth returns a boolean if a field has been set.
+func (o *EntityIds) HasAuth() bool {
+	if o != nil && !IsNil(o.Auth) {
+		return true
+	}
+
+	return false
+}
+
+// SetAuth gets a reference to the given AuthContext and assigns it to the Auth field.
+func (o *EntityIds) SetAuth(v AuthContext) {
+	o.Auth = &v
+}
+
+// GetSkuId returns the SkuId field value if set, zero value otherwise.
+func (o *EntityIds) GetSkuId() string {
+	if o == nil || IsNil(o.SkuId) {
+		var ret string
+		return ret
+	}
+	return *o.SkuId
+}
+
+// GetSkuIdOk returns a tuple with the SkuId field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *EntityIds) GetSkuIdOk() (*string, bool) {
+	if o == nil || IsNil(o.SkuId) {
+		return nil, false
+	}
+	return o.SkuId, true
+}
+
+// HasSkuId returns a boolean if a field has been set.
+func (o *EntityIds) HasSkuId() bool {
+	if o != nil && !IsNil(o.SkuId) {
+		return true
+	}
+
+	return false
+}
+
+// SetSkuId gets a reference to the given string and assigns it to the SkuId field.
+func (o *EntityIds) SetSkuId(v string) {
+	o.SkuId = &v
+}
+
+// GetSkuHandle returns the SkuHandle field value if set, zero value otherwise.
+func (o *EntityIds) GetSkuHandle() string {
+	if o == nil || IsNil(o.SkuHandle) {
+		var ret string
+		return ret
+	}
+	return *o.SkuHandle
+}
+
+// GetSkuHandleOk returns a tuple with the SkuHandle field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *EntityIds) GetSkuHandleOk() (*string, bool) {
+	if o == nil || IsNil(o.SkuHandle) {
+		return nil, false
+	}
+	return o.SkuHandle, true
+}
+
+// HasSkuHandle returns a boolean if a field has been set.
+func (o *EntityIds) HasSkuHandle() bool {
+	if o != nil && !IsNil(o.SkuHandle) {
+		return true
+	}
+
+	return false
+}
+
+// SetSkuHandle gets a reference to the given string and assigns it to the SkuHandle field.
+func (o *EntityIds) SetSkuHandle(v string) {
+	o.SkuHandle = &v
 }
 
 // GetPaymentInstrumentId returns the PaymentInstrumentId field value if set, zero value otherwise.
@@ -285,6 +387,38 @@ func (o *EntityIds) HasSessionId() bool {
 // SetSessionId gets a reference to the given string and assigns it to the SessionId field.
 func (o *EntityIds) SetSessionId(v string) {
 	o.SessionId = &v
+}
+
+// GetAgent returns the Agent field value if set, zero value otherwise.
+func (o *EntityIds) GetAgent() AgentManifest {
+	if o == nil || IsNil(o.Agent) {
+		var ret AgentManifest
+		return ret
+	}
+	return *o.Agent
+}
+
+// GetAgentOk returns a tuple with the Agent field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *EntityIds) GetAgentOk() (*AgentManifest, bool) {
+	if o == nil || IsNil(o.Agent) {
+		return nil, false
+	}
+	return o.Agent, true
+}
+
+// HasAgent returns a boolean if a field has been set.
+func (o *EntityIds) HasAgent() bool {
+	if o != nil && !IsNil(o.Agent) {
+		return true
+	}
+
+	return false
+}
+
+// SetAgent gets a reference to the given AgentManifest and assigns it to the Agent field.
+func (o *EntityIds) SetAgent(v AgentManifest) {
+	o.Agent = &v
 }
 
 // GetEmailHash returns the EmailHash field value if set, zero value otherwise.
@@ -466,8 +600,17 @@ func (o EntityIds) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.EndCustomerId) {
 		toSerialize["endCustomerId"] = o.EndCustomerId
 	}
-	if !IsNil(o.MemberId) {
-		toSerialize["memberId"] = o.MemberId
+	if !IsNil(o.OperatorId) {
+		toSerialize["operatorId"] = o.OperatorId
+	}
+	if !IsNil(o.Auth) {
+		toSerialize["auth"] = o.Auth
+	}
+	if !IsNil(o.SkuId) {
+		toSerialize["skuId"] = o.SkuId
+	}
+	if !IsNil(o.SkuHandle) {
+		toSerialize["skuHandle"] = o.SkuHandle
 	}
 	if !IsNil(o.PaymentInstrumentId) {
 		toSerialize["paymentInstrumentId"] = o.PaymentInstrumentId
@@ -477,6 +620,9 @@ func (o EntityIds) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.SessionId) {
 		toSerialize["sessionId"] = o.SessionId
+	}
+	if !IsNil(o.Agent) {
+		toSerialize["agent"] = o.Agent
 	}
 	if !IsNil(o.EmailHash) {
 		toSerialize["emailHash"] = o.EmailHash

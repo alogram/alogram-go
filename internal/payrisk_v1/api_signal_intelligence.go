@@ -3,7 +3,7 @@ Alogram PayRisk Engine
 
 Alogram PayRisk is an AI-native decision engine built for the speed and  complexity of the modern commerce era. In a high-velocity world where  AI-driven threats evolve in milliseconds, Alogram provides the real-time  adaptability and forensic transparency needed to protect your ecosystem  with total confidence. We solve the challenge of balancing frictionless  growth with regulatory explainability, delivering instant, intelligent  risk orchestration at enterprise scale.  ---   ## Licensing & Terms   Our client libraries and API specifications are open-source under the **Apache License 2.0**  to ensure seamless integration into your tech stack.  Use of the Alogram PayRisk API service is proprietary and governed by our  [Terms of Service](https://alogram.ai/#tos) and your specific **Enterprise Agreement**,  if applicable.  To access the service, you must have: *   A valid Alogram API Key. *   An active subscription or signed Master Service Agreement.  Unauthorized use, including automated scraping or reverse engineering of the  scoring engine, is strictly prohibited.   ---   ## Support & Traceability   Every Alogram API response includes a unique **`x-trace-id`** header.  Please include this ID when contacting [packages@alogram.ai](mailto:packages@alogram.ai)  regarding specific transactions or errors.   ---   ## Specification   The authoritative OpenAPI specification for this version is available for download: **[Download openapi.yaml](https://developers.alogram.ai/openapi.yaml)** | **[Download openapi.json](https://developers.alogram.ai/openapi.json)** 
 
-API version: 0.2.10
+API version: 0.2.21
 Contact: packages@alogram.ai
 */
 
@@ -29,6 +29,7 @@ type ApiIngestPaymentEventRequest struct {
 	xIdempotencyKey *string
 	paymentEvent *PaymentEvent
 	xTraceId *string
+	xAlogramAgentManifest *AgentManifest
 }
 
 // Unique Idempotency-Key sent in the POST request etc.
@@ -48,7 +49,13 @@ func (r ApiIngestPaymentEventRequest) XTraceId(xTraceId string) ApiIngestPayment
 	return r
 }
 
-func (r ApiIngestPaymentEventRequest) Execute() (*http.Response, error) {
+// JSON-encoded AgentManifest for autonomous shopping agents.  Required for machine-to-machine trust validation (UCP/MCP). 
+func (r ApiIngestPaymentEventRequest) XAlogramAgentManifest(xAlogramAgentManifest AgentManifest) ApiIngestPaymentEventRequest {
+	r.xAlogramAgentManifest = &xAlogramAgentManifest
+	return r
+}
+
+func (r ApiIngestPaymentEventRequest) Execute() (*IngestPaymentEvent202Response, *http.Response, error) {
 	return r.ApiService.IngestPaymentEventExecute(r)
 }
 
@@ -66,16 +73,18 @@ func (a *SignalIntelligenceAPIService) IngestPaymentEvent(ctx context.Context) A
 }
 
 // Execute executes the request
-func (a *SignalIntelligenceAPIService) IngestPaymentEventExecute(r ApiIngestPaymentEventRequest) (*http.Response, error) {
+//  @return IngestPaymentEvent202Response
+func (a *SignalIntelligenceAPIService) IngestPaymentEventExecute(r ApiIngestPaymentEventRequest) (*IngestPaymentEvent202Response, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
 		localVarPostBody     interface{}
 		formFiles            []formFile
+		localVarReturnValue  *IngestPaymentEvent202Response
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "SignalIntelligenceAPIService.IngestPaymentEvent")
 	if err != nil {
-		return nil, &GenericOpenAPIError{error: err.Error()}
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
 	localVarPath := localBasePath + "/v1/events"
@@ -84,16 +93,16 @@ func (a *SignalIntelligenceAPIService) IngestPaymentEventExecute(r ApiIngestPaym
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
 	if r.xIdempotencyKey == nil {
-		return nil, reportError("xIdempotencyKey is required and must be specified")
+		return localVarReturnValue, nil, reportError("xIdempotencyKey is required and must be specified")
 	}
 	if strlen(*r.xIdempotencyKey) < 36 {
-		return nil, reportError("xIdempotencyKey must have at least 36 elements")
+		return localVarReturnValue, nil, reportError("xIdempotencyKey must have at least 36 elements")
 	}
 	if strlen(*r.xIdempotencyKey) > 36 {
-		return nil, reportError("xIdempotencyKey must have less than 36 elements")
+		return localVarReturnValue, nil, reportError("xIdempotencyKey must have less than 36 elements")
 	}
 	if r.paymentEvent == nil {
-		return nil, reportError("paymentEvent is required and must be specified")
+		return localVarReturnValue, nil, reportError("paymentEvent is required and must be specified")
 	}
 
 	// to determine the Content-Type header
@@ -106,7 +115,7 @@ func (a *SignalIntelligenceAPIService) IngestPaymentEventExecute(r ApiIngestPaym
 	}
 
 	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{"application/problem+json"}
+	localVarHTTPHeaderAccepts := []string{"application/json", "application/problem+json"}
 
 	// set Accept header
 	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
@@ -117,6 +126,9 @@ func (a *SignalIntelligenceAPIService) IngestPaymentEventExecute(r ApiIngestPaym
 		parameterAddToHeaderOrQuery(localVarHeaderParams, "x-trace-id", r.xTraceId, "simple", "")
 	}
 	parameterAddToHeaderOrQuery(localVarHeaderParams, "x-idempotency-key", r.xIdempotencyKey, "", "")
+	if r.xAlogramAgentManifest != nil {
+		parameterAddToHeaderOrQuery(localVarHeaderParams, "x-alogram-agent-manifest", r.xAlogramAgentManifest, "", "")
+	}
 	// body params
 	localVarPostBody = r.paymentEvent
 	if r.ctx != nil {
@@ -135,19 +147,19 @@ func (a *SignalIntelligenceAPIService) IngestPaymentEventExecute(r ApiIngestPaym
 	}
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
-		return nil, err
+		return localVarReturnValue, nil, err
 	}
 
 	localVarHTTPResponse, err := a.client.callAPI(req)
 	if err != nil || localVarHTTPResponse == nil {
-		return localVarHTTPResponse, err
+		return localVarReturnValue, localVarHTTPResponse, err
 	}
 
 	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
 	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
-		return localVarHTTPResponse, err
+		return localVarReturnValue, localVarHTTPResponse, err
 	}
 
 	if localVarHTTPResponse.StatusCode >= 300 {
@@ -160,103 +172,112 @@ func (a *SignalIntelligenceAPIService) IngestPaymentEventExecute(r ApiIngestPaym
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
-				return localVarHTTPResponse, newErr
+				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 					newErr.model = v
-			return localVarHTTPResponse, newErr
+			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 401 {
 			var v Problem
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
-				return localVarHTTPResponse, newErr
+				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 					newErr.model = v
-			return localVarHTTPResponse, newErr
+			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 403 {
 			var v Problem
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
-				return localVarHTTPResponse, newErr
+				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 					newErr.model = v
-			return localVarHTTPResponse, newErr
+			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
 			var v Problem
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
-				return localVarHTTPResponse, newErr
+				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 					newErr.model = v
-			return localVarHTTPResponse, newErr
+			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 409 {
 			var v Problem
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
-				return localVarHTTPResponse, newErr
+				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 					newErr.model = v
-			return localVarHTTPResponse, newErr
+			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 413 {
 			var v Problem
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
-				return localVarHTTPResponse, newErr
+				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 					newErr.model = v
-			return localVarHTTPResponse, newErr
+			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 422 {
 			var v Problem
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
-				return localVarHTTPResponse, newErr
+				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 					newErr.model = v
-			return localVarHTTPResponse, newErr
+			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 429 {
 			var v Problem
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
-				return localVarHTTPResponse, newErr
+				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 					newErr.model = v
-			return localVarHTTPResponse, newErr
+			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 500 {
 			var v Problem
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
-				return localVarHTTPResponse, newErr
+				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 					newErr.model = v
 		}
-		return localVarHTTPResponse, newErr
+		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
 
-	return localVarHTTPResponse, nil
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
 type ApiIngestSignalsRequest struct {
@@ -265,6 +286,7 @@ type ApiIngestSignalsRequest struct {
 	xIdempotencyKey *string
 	signalsRequest *SignalsRequest
 	xTraceId *string
+	xAlogramAgentManifest *AgentManifest
 }
 
 // Unique Idempotency-Key sent in the POST request etc.
@@ -284,7 +306,13 @@ func (r ApiIngestSignalsRequest) XTraceId(xTraceId string) ApiIngestSignalsReque
 	return r
 }
 
-func (r ApiIngestSignalsRequest) Execute() (*http.Response, error) {
+// JSON-encoded AgentManifest for autonomous shopping agents.  Required for machine-to-machine trust validation (UCP/MCP). 
+func (r ApiIngestSignalsRequest) XAlogramAgentManifest(xAlogramAgentManifest AgentManifest) ApiIngestSignalsRequest {
+	r.xAlogramAgentManifest = &xAlogramAgentManifest
+	return r
+}
+
+func (r ApiIngestSignalsRequest) Execute() (*IngestPaymentEvent202Response, *http.Response, error) {
 	return r.ApiService.IngestSignalsExecute(r)
 }
 
@@ -302,16 +330,18 @@ func (a *SignalIntelligenceAPIService) IngestSignals(ctx context.Context) ApiIng
 }
 
 // Execute executes the request
-func (a *SignalIntelligenceAPIService) IngestSignalsExecute(r ApiIngestSignalsRequest) (*http.Response, error) {
+//  @return IngestPaymentEvent202Response
+func (a *SignalIntelligenceAPIService) IngestSignalsExecute(r ApiIngestSignalsRequest) (*IngestPaymentEvent202Response, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
 		localVarPostBody     interface{}
 		formFiles            []formFile
+		localVarReturnValue  *IngestPaymentEvent202Response
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "SignalIntelligenceAPIService.IngestSignals")
 	if err != nil {
-		return nil, &GenericOpenAPIError{error: err.Error()}
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
 	localVarPath := localBasePath + "/v1/signals"
@@ -320,16 +350,16 @@ func (a *SignalIntelligenceAPIService) IngestSignalsExecute(r ApiIngestSignalsRe
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
 	if r.xIdempotencyKey == nil {
-		return nil, reportError("xIdempotencyKey is required and must be specified")
+		return localVarReturnValue, nil, reportError("xIdempotencyKey is required and must be specified")
 	}
 	if strlen(*r.xIdempotencyKey) < 36 {
-		return nil, reportError("xIdempotencyKey must have at least 36 elements")
+		return localVarReturnValue, nil, reportError("xIdempotencyKey must have at least 36 elements")
 	}
 	if strlen(*r.xIdempotencyKey) > 36 {
-		return nil, reportError("xIdempotencyKey must have less than 36 elements")
+		return localVarReturnValue, nil, reportError("xIdempotencyKey must have less than 36 elements")
 	}
 	if r.signalsRequest == nil {
-		return nil, reportError("signalsRequest is required and must be specified")
+		return localVarReturnValue, nil, reportError("signalsRequest is required and must be specified")
 	}
 
 	// to determine the Content-Type header
@@ -342,7 +372,7 @@ func (a *SignalIntelligenceAPIService) IngestSignalsExecute(r ApiIngestSignalsRe
 	}
 
 	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{"application/problem+json"}
+	localVarHTTPHeaderAccepts := []string{"application/json", "application/problem+json"}
 
 	// set Accept header
 	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
@@ -353,6 +383,9 @@ func (a *SignalIntelligenceAPIService) IngestSignalsExecute(r ApiIngestSignalsRe
 		parameterAddToHeaderOrQuery(localVarHeaderParams, "x-trace-id", r.xTraceId, "simple", "")
 	}
 	parameterAddToHeaderOrQuery(localVarHeaderParams, "x-idempotency-key", r.xIdempotencyKey, "", "")
+	if r.xAlogramAgentManifest != nil {
+		parameterAddToHeaderOrQuery(localVarHeaderParams, "x-alogram-agent-manifest", r.xAlogramAgentManifest, "", "")
+	}
 	// body params
 	localVarPostBody = r.signalsRequest
 	if r.ctx != nil {
@@ -371,19 +404,19 @@ func (a *SignalIntelligenceAPIService) IngestSignalsExecute(r ApiIngestSignalsRe
 	}
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
-		return nil, err
+		return localVarReturnValue, nil, err
 	}
 
 	localVarHTTPResponse, err := a.client.callAPI(req)
 	if err != nil || localVarHTTPResponse == nil {
-		return localVarHTTPResponse, err
+		return localVarReturnValue, localVarHTTPResponse, err
 	}
 
 	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
 	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
-		return localVarHTTPResponse, err
+		return localVarReturnValue, localVarHTTPResponse, err
 	}
 
 	if localVarHTTPResponse.StatusCode >= 300 {
@@ -396,57 +429,66 @@ func (a *SignalIntelligenceAPIService) IngestSignalsExecute(r ApiIngestSignalsRe
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
-				return localVarHTTPResponse, newErr
+				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 					newErr.model = v
-			return localVarHTTPResponse, newErr
+			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 413 {
 			var v Problem
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
-				return localVarHTTPResponse, newErr
+				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 					newErr.model = v
-			return localVarHTTPResponse, newErr
+			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 422 {
 			var v Problem
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
-				return localVarHTTPResponse, newErr
+				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 					newErr.model = v
-			return localVarHTTPResponse, newErr
+			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 429 {
 			var v Problem
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
-				return localVarHTTPResponse, newErr
+				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 					newErr.model = v
-			return localVarHTTPResponse, newErr
+			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 500 {
 			var v Problem
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
-				return localVarHTTPResponse, newErr
+				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
 					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
 					newErr.model = v
 		}
-		return localVarHTTPResponse, newErr
+		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
 
-	return localVarHTTPResponse, nil
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
 }

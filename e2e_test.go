@@ -131,7 +131,7 @@ func TestE2E_Simulator(t *testing.T) {
 	payloadJson, _ := json.MarshalIndent(sigReq, "", "  ")
 	fmt.Printf("📦 Signals Payload:\n%s\n", string(payloadJson))
 
-	_, err := client.SignalIntelligenceAPI.IngestSignals(authCtx).
+	_, _, err := client.SignalIntelligenceAPI.IngestSignals(authCtx).
 		SignalsRequest(sigReq).
 		XIdempotencyKey(fmt.Sprintf("idk_%032x", time.Now().UnixNano())).
 		Execute()
@@ -182,7 +182,7 @@ func TestE2E_Simulator(t *testing.T) {
 				},
 			},
 		}
-		_, err = client.SignalIntelligenceAPI.IngestPaymentEvent(authCtx).
+		_, _, err = client.SignalIntelligenceAPI.IngestPaymentEvent(authCtx).
 			PaymentEvent(eventAuth).
 			XIdempotencyKey(fmt.Sprintf("idk_%032x", time.Now().UnixNano())).
 			Execute()
@@ -205,7 +205,7 @@ func TestE2E_Simulator(t *testing.T) {
 				},
 			},
 		}
-		_, err = client.SignalIntelligenceAPI.IngestPaymentEvent(authCtx).
+		_, _, err = client.SignalIntelligenceAPI.IngestPaymentEvent(authCtx).
 			PaymentEvent(eventCap).
 			XIdempotencyKey(fmt.Sprintf("idk_%032x", time.Now().UnixNano())).
 			Execute()

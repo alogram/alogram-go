@@ -241,7 +241,7 @@ func (c *baseClient) ingestSignals(ctx context.Context, req payrisk_v1.SignalsRe
 	))
 	defer span.End()
 
-	httpResp, err := c.api.SignalIntelligenceAPI.IngestSignals(ctx).
+	_, httpResp, err := c.api.SignalIntelligenceAPI.IngestSignals(ctx).
 		XIdempotencyKey(ik).
 		XTraceId(tid).
 		SignalsRequest(req).
@@ -271,7 +271,7 @@ func (c *AlogramRiskClient) IngestEvent(ctx context.Context, event payrisk_v1.Pa
 	))
 	defer span.End()
 
-	httpResp, err := c.api.SignalIntelligenceAPI.IngestPaymentEvent(ctx).
+	_, httpResp, err := c.api.SignalIntelligenceAPI.IngestPaymentEvent(ctx).
 		XIdempotencyKey(ik).
 		XTraceId(tid).
 		PaymentEvent(event).

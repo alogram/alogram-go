@@ -15,34 +15,33 @@ import (
 	"encoding/json"
 )
 
-// checks if the PaymentDisputeOutcome type satisfies the MappedNullable interface at compile time
-var _ MappedNullable = &PaymentDisputeOutcome{}
+// checks if the IngestPaymentEvent202Response type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &IngestPaymentEvent202Response{}
 
-// PaymentDisputeOutcome Dispute lifecycle status for the transaction.
-type PaymentDisputeOutcome struct {
-	// Dispute status.
+// IngestPaymentEvent202Response struct for IngestPaymentEvent202Response
+type IngestPaymentEvent202Response struct {
 	Status *string `json:"status,omitempty"`
 }
 
-// NewPaymentDisputeOutcome instantiates a new PaymentDisputeOutcome object
+// NewIngestPaymentEvent202Response instantiates a new IngestPaymentEvent202Response object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewPaymentDisputeOutcome() *PaymentDisputeOutcome {
-	this := PaymentDisputeOutcome{}
+func NewIngestPaymentEvent202Response() *IngestPaymentEvent202Response {
+	this := IngestPaymentEvent202Response{}
 	return &this
 }
 
-// NewPaymentDisputeOutcomeWithDefaults instantiates a new PaymentDisputeOutcome object
+// NewIngestPaymentEvent202ResponseWithDefaults instantiates a new IngestPaymentEvent202Response object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewPaymentDisputeOutcomeWithDefaults() *PaymentDisputeOutcome {
-	this := PaymentDisputeOutcome{}
+func NewIngestPaymentEvent202ResponseWithDefaults() *IngestPaymentEvent202Response {
+	this := IngestPaymentEvent202Response{}
 	return &this
 }
 
 // GetStatus returns the Status field value if set, zero value otherwise.
-func (o *PaymentDisputeOutcome) GetStatus() string {
+func (o *IngestPaymentEvent202Response) GetStatus() string {
 	if o == nil || IsNil(o.Status) {
 		var ret string
 		return ret
@@ -52,7 +51,7 @@ func (o *PaymentDisputeOutcome) GetStatus() string {
 
 // GetStatusOk returns a tuple with the Status field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *PaymentDisputeOutcome) GetStatusOk() (*string, bool) {
+func (o *IngestPaymentEvent202Response) GetStatusOk() (*string, bool) {
 	if o == nil || IsNil(o.Status) {
 		return nil, false
 	}
@@ -60,7 +59,7 @@ func (o *PaymentDisputeOutcome) GetStatusOk() (*string, bool) {
 }
 
 // HasStatus returns a boolean if a field has been set.
-func (o *PaymentDisputeOutcome) HasStatus() bool {
+func (o *IngestPaymentEvent202Response) HasStatus() bool {
 	if o != nil && !IsNil(o.Status) {
 		return true
 	}
@@ -69,11 +68,11 @@ func (o *PaymentDisputeOutcome) HasStatus() bool {
 }
 
 // SetStatus gets a reference to the given string and assigns it to the Status field.
-func (o *PaymentDisputeOutcome) SetStatus(v string) {
+func (o *IngestPaymentEvent202Response) SetStatus(v string) {
 	o.Status = &v
 }
 
-func (o PaymentDisputeOutcome) MarshalJSON() ([]byte, error) {
+func (o IngestPaymentEvent202Response) MarshalJSON() ([]byte, error) {
 	toSerialize,err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
@@ -81,7 +80,7 @@ func (o PaymentDisputeOutcome) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toSerialize)
 }
 
-func (o PaymentDisputeOutcome) ToMap() (map[string]interface{}, error) {
+func (o IngestPaymentEvent202Response) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if !IsNil(o.Status) {
 		toSerialize["status"] = o.Status
@@ -89,38 +88,38 @@ func (o PaymentDisputeOutcome) ToMap() (map[string]interface{}, error) {
 	return toSerialize, nil
 }
 
-type NullablePaymentDisputeOutcome struct {
-	value *PaymentDisputeOutcome
+type NullableIngestPaymentEvent202Response struct {
+	value *IngestPaymentEvent202Response
 	isSet bool
 }
 
-func (v NullablePaymentDisputeOutcome) Get() *PaymentDisputeOutcome {
+func (v NullableIngestPaymentEvent202Response) Get() *IngestPaymentEvent202Response {
 	return v.value
 }
 
-func (v *NullablePaymentDisputeOutcome) Set(val *PaymentDisputeOutcome) {
+func (v *NullableIngestPaymentEvent202Response) Set(val *IngestPaymentEvent202Response) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullablePaymentDisputeOutcome) IsSet() bool {
+func (v NullableIngestPaymentEvent202Response) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullablePaymentDisputeOutcome) Unset() {
+func (v *NullableIngestPaymentEvent202Response) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullablePaymentDisputeOutcome(val *PaymentDisputeOutcome) *NullablePaymentDisputeOutcome {
-	return &NullablePaymentDisputeOutcome{value: val, isSet: true}
+func NewNullableIngestPaymentEvent202Response(val *IngestPaymentEvent202Response) *NullableIngestPaymentEvent202Response {
+	return &NullableIngestPaymentEvent202Response{value: val, isSet: true}
 }
 
-func (v NullablePaymentDisputeOutcome) MarshalJSON() ([]byte, error) {
+func (v NullableIngestPaymentEvent202Response) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullablePaymentDisputeOutcome) UnmarshalJSON(src []byte) error {
+func (v *NullableIngestPaymentEvent202Response) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }

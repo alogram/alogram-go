@@ -3,7 +3,7 @@ Alogram PayRisk Engine
 
 Alogram PayRisk is an AI-native decision engine built for the speed and  complexity of the modern commerce era. In a high-velocity world where  AI-driven threats evolve in milliseconds, Alogram provides the real-time  adaptability and forensic transparency needed to protect your ecosystem  with total confidence. We solve the challenge of balancing frictionless  growth with regulatory explainability, delivering instant, intelligent  risk orchestration at enterprise scale.  ---   ## Licensing & Terms   Our client libraries and API specifications are open-source under the **Apache License 2.0**  to ensure seamless integration into your tech stack.  Use of the Alogram PayRisk API service is proprietary and governed by our  [Terms of Service](https://alogram.ai/#tos) and your specific **Enterprise Agreement**,  if applicable.  To access the service, you must have: *   A valid Alogram API Key. *   An active subscription or signed Master Service Agreement.  Unauthorized use, including automated scraping or reverse engineering of the  scoring engine, is strictly prohibited.   ---   ## Support & Traceability   Every Alogram API response includes a unique **`x-trace-id`** header.  Please include this ID when contacting [packages@alogram.ai](mailto:packages@alogram.ai)  regarding specific transactions or errors.   ---   ## Specification   The authoritative OpenAPI specification for this version is available for download: **[Download openapi.yaml](https://developers.alogram.ai/openapi.yaml)** | **[Download openapi.json](https://developers.alogram.ai/openapi.json)** 
 
-API version: 0.2.10
+API version: 0.2.21
 Contact: packages@alogram.ai
 */
 
@@ -29,6 +29,7 @@ type ApiAccountRiskCheckRequest struct {
 	xIdempotencyKey *string
 	accountCheckRequest *AccountCheckRequest
 	xTraceId *string
+	xAlogramAgentManifest *AgentManifest
 }
 
 // Unique Idempotency-Key sent in the POST request etc.
@@ -45,6 +46,12 @@ func (r ApiAccountRiskCheckRequest) AccountCheckRequest(accountCheckRequest Acco
 // Echoed or generated trace ID for tracking requests.
 func (r ApiAccountRiskCheckRequest) XTraceId(xTraceId string) ApiAccountRiskCheckRequest {
 	r.xTraceId = &xTraceId
+	return r
+}
+
+// JSON-encoded AgentManifest for autonomous shopping agents.  Required for machine-to-machine trust validation (UCP/MCP). 
+func (r ApiAccountRiskCheckRequest) XAlogramAgentManifest(xAlogramAgentManifest AgentManifest) ApiAccountRiskCheckRequest {
+	r.xAlogramAgentManifest = &xAlogramAgentManifest
 	return r
 }
 
@@ -123,6 +130,9 @@ func (a *RoadmapPreviewAPIService) AccountRiskCheckExecute(r ApiAccountRiskCheck
 		parameterAddToHeaderOrQuery(localVarHeaderParams, "x-trace-id", r.xTraceId, "simple", "")
 	}
 	parameterAddToHeaderOrQuery(localVarHeaderParams, "x-idempotency-key", r.xIdempotencyKey, "", "")
+	if r.xAlogramAgentManifest != nil {
+		parameterAddToHeaderOrQuery(localVarHeaderParams, "x-alogram-agent-manifest", r.xAlogramAgentManifest, "", "")
+	}
 	// body params
 	localVarPostBody = r.accountCheckRequest
 	if r.ctx != nil {
@@ -225,6 +235,7 @@ type ApiKycRiskCheckRequest struct {
 	xIdempotencyKey *string
 	kycCheckRequest *KycCheckRequest
 	xTraceId *string
+	xAlogramAgentManifest *AgentManifest
 }
 
 // Unique Idempotency-Key sent in the POST request etc.
@@ -241,6 +252,12 @@ func (r ApiKycRiskCheckRequest) KycCheckRequest(kycCheckRequest KycCheckRequest)
 // Echoed or generated trace ID for tracking requests.
 func (r ApiKycRiskCheckRequest) XTraceId(xTraceId string) ApiKycRiskCheckRequest {
 	r.xTraceId = &xTraceId
+	return r
+}
+
+// JSON-encoded AgentManifest for autonomous shopping agents.  Required for machine-to-machine trust validation (UCP/MCP). 
+func (r ApiKycRiskCheckRequest) XAlogramAgentManifest(xAlogramAgentManifest AgentManifest) ApiKycRiskCheckRequest {
+	r.xAlogramAgentManifest = &xAlogramAgentManifest
 	return r
 }
 
@@ -319,6 +336,9 @@ func (a *RoadmapPreviewAPIService) KycRiskCheckExecute(r ApiKycRiskCheckRequest)
 		parameterAddToHeaderOrQuery(localVarHeaderParams, "x-trace-id", r.xTraceId, "simple", "")
 	}
 	parameterAddToHeaderOrQuery(localVarHeaderParams, "x-idempotency-key", r.xIdempotencyKey, "", "")
+	if r.xAlogramAgentManifest != nil {
+		parameterAddToHeaderOrQuery(localVarHeaderParams, "x-alogram-agent-manifest", r.xAlogramAgentManifest, "", "")
+	}
 	// body params
 	localVarPostBody = r.kycCheckRequest
 	if r.ctx != nil {

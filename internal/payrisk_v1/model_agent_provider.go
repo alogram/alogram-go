@@ -16,56 +16,58 @@ import (
 	"fmt"
 )
 
-// ChannelEnum pos: 'Point of Sale', ecom: 'E-commerce', in_app: 'In-App Purchase', ivr: 'Interactive Voice Response'. 
-type ChannelEnum string
+// AgentProvider The AI system provider that issued the agent manifest.
+type AgentProvider string
 
-// List of ChannelEnum
+// List of AgentProvider
 const (
-	CHANNELENUM_POS ChannelEnum = "pos"
-	CHANNELENUM_ECOM ChannelEnum = "ecom"
-	CHANNELENUM_IN_APP ChannelEnum = "in_app"
-	CHANNELENUM_IVR ChannelEnum = "ivr"
+	AGENTPROVIDER_GOOGLE AgentProvider = "google"
+	AGENTPROVIDER_OPENAI AgentProvider = "openai"
+	AGENTPROVIDER_ANTHROPIC AgentProvider = "anthropic"
+	AGENTPROVIDER_ALOGRAM AgentProvider = "alogram"
+	AGENTPROVIDER_OTHER AgentProvider = "other"
 )
 
-// All allowed values of ChannelEnum enum
-var AllowedChannelEnumEnumValues = []ChannelEnum{
-	"pos",
-	"ecom",
-	"in_app",
-	"ivr",
+// All allowed values of AgentProvider enum
+var AllowedAgentProviderEnumValues = []AgentProvider{
+	"google",
+	"openai",
+	"anthropic",
+	"alogram",
+	"other",
 }
 
-func (v *ChannelEnum) UnmarshalJSON(src []byte) error {
+func (v *AgentProvider) UnmarshalJSON(src []byte) error {
 	var value string
 	err := json.Unmarshal(src, &value)
 	if err != nil {
 		return err
 	}
-	enumTypeValue := ChannelEnum(value)
-	for _, existing := range AllowedChannelEnumEnumValues {
+	enumTypeValue := AgentProvider(value)
+	for _, existing := range AllowedAgentProviderEnumValues {
 		if existing == enumTypeValue {
 			*v = enumTypeValue
 			return nil
 		}
 	}
 
-	return fmt.Errorf("%+v is not a valid ChannelEnum", value)
+	return fmt.Errorf("%+v is not a valid AgentProvider", value)
 }
 
-// NewChannelEnumFromValue returns a pointer to a valid ChannelEnum
+// NewAgentProviderFromValue returns a pointer to a valid AgentProvider
 // for the value passed as argument, or an error if the value passed is not allowed by the enum
-func NewChannelEnumFromValue(v string) (*ChannelEnum, error) {
-	ev := ChannelEnum(v)
+func NewAgentProviderFromValue(v string) (*AgentProvider, error) {
+	ev := AgentProvider(v)
 	if ev.IsValid() {
 		return &ev, nil
 	} else {
-		return nil, fmt.Errorf("invalid value '%v' for ChannelEnum: valid values are %v", v, AllowedChannelEnumEnumValues)
+		return nil, fmt.Errorf("invalid value '%v' for AgentProvider: valid values are %v", v, AllowedAgentProviderEnumValues)
 	}
 }
 
 // IsValid return true if the value is valid for the enum, false otherwise
-func (v ChannelEnum) IsValid() bool {
-	for _, existing := range AllowedChannelEnumEnumValues {
+func (v AgentProvider) IsValid() bool {
+	for _, existing := range AllowedAgentProviderEnumValues {
 		if existing == v {
 			return true
 		}
@@ -73,43 +75,43 @@ func (v ChannelEnum) IsValid() bool {
 	return false
 }
 
-// Ptr returns reference to ChannelEnum value
-func (v ChannelEnum) Ptr() *ChannelEnum {
+// Ptr returns reference to AgentProvider value
+func (v AgentProvider) Ptr() *AgentProvider {
 	return &v
 }
 
-type NullableChannelEnum struct {
-	value *ChannelEnum
+type NullableAgentProvider struct {
+	value *AgentProvider
 	isSet bool
 }
 
-func (v NullableChannelEnum) Get() *ChannelEnum {
+func (v NullableAgentProvider) Get() *AgentProvider {
 	return v.value
 }
 
-func (v *NullableChannelEnum) Set(val *ChannelEnum) {
+func (v *NullableAgentProvider) Set(val *AgentProvider) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableChannelEnum) IsSet() bool {
+func (v NullableAgentProvider) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableChannelEnum) Unset() {
+func (v *NullableAgentProvider) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableChannelEnum(val *ChannelEnum) *NullableChannelEnum {
-	return &NullableChannelEnum{value: val, isSet: true}
+func NewNullableAgentProvider(val *AgentProvider) *NullableAgentProvider {
+	return &NullableAgentProvider{value: val, isSet: true}
 }
 
-func (v NullableChannelEnum) MarshalJSON() ([]byte, error) {
+func (v NullableAgentProvider) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableChannelEnum) UnmarshalJSON(src []byte) error {
+func (v *NullableAgentProvider) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }

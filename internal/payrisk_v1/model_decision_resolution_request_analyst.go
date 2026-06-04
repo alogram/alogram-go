@@ -17,94 +17,87 @@ import (
 	"fmt"
 )
 
-// checks if the ScoresSuccessResponse type satisfies the MappedNullable interface at compile time
-var _ MappedNullable = &ScoresSuccessResponse{}
+// checks if the DecisionResolutionRequestAnalyst type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &DecisionResolutionRequestAnalyst{}
 
-// ScoresSuccessResponse List of fraud scores for a customer.
-type ScoresSuccessResponse struct {
-	// Score records within the requested window.
-	Scores []ScoreRecord `json:"scores"`
-	// A token for retrieving the next page of results.
-	NextPageToken *string `json:"nextPageToken,omitempty"`
+// DecisionResolutionRequestAnalyst struct for DecisionResolutionRequestAnalyst
+type DecisionResolutionRequestAnalyst struct {
+	// The unique ID of the operator, SRE, or autonomous agent.
+	Id string `json:"id"`
+	// The system role of the decision maker.
+	Type string `json:"type"`
 }
 
-type _ScoresSuccessResponse ScoresSuccessResponse
+type _DecisionResolutionRequestAnalyst DecisionResolutionRequestAnalyst
 
-// NewScoresSuccessResponse instantiates a new ScoresSuccessResponse object
+// NewDecisionResolutionRequestAnalyst instantiates a new DecisionResolutionRequestAnalyst object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewScoresSuccessResponse(scores []ScoreRecord) *ScoresSuccessResponse {
-	this := ScoresSuccessResponse{}
-	this.Scores = scores
+func NewDecisionResolutionRequestAnalyst(id string, type_ string) *DecisionResolutionRequestAnalyst {
+	this := DecisionResolutionRequestAnalyst{}
+	this.Id = id
+	this.Type = type_
 	return &this
 }
 
-// NewScoresSuccessResponseWithDefaults instantiates a new ScoresSuccessResponse object
+// NewDecisionResolutionRequestAnalystWithDefaults instantiates a new DecisionResolutionRequestAnalyst object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewScoresSuccessResponseWithDefaults() *ScoresSuccessResponse {
-	this := ScoresSuccessResponse{}
+func NewDecisionResolutionRequestAnalystWithDefaults() *DecisionResolutionRequestAnalyst {
+	this := DecisionResolutionRequestAnalyst{}
 	return &this
 }
 
-// GetScores returns the Scores field value
-func (o *ScoresSuccessResponse) GetScores() []ScoreRecord {
+// GetId returns the Id field value
+func (o *DecisionResolutionRequestAnalyst) GetId() string {
 	if o == nil {
-		var ret []ScoreRecord
-		return ret
-	}
-
-	return o.Scores
-}
-
-// GetScoresOk returns a tuple with the Scores field value
-// and a boolean to check if the value has been set.
-func (o *ScoresSuccessResponse) GetScoresOk() ([]ScoreRecord, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return o.Scores, true
-}
-
-// SetScores sets field value
-func (o *ScoresSuccessResponse) SetScores(v []ScoreRecord) {
-	o.Scores = v
-}
-
-// GetNextPageToken returns the NextPageToken field value if set, zero value otherwise.
-func (o *ScoresSuccessResponse) GetNextPageToken() string {
-	if o == nil || IsNil(o.NextPageToken) {
 		var ret string
 		return ret
 	}
-	return *o.NextPageToken
+
+	return o.Id
 }
 
-// GetNextPageTokenOk returns a tuple with the NextPageToken field value if set, nil otherwise
+// GetIdOk returns a tuple with the Id field value
 // and a boolean to check if the value has been set.
-func (o *ScoresSuccessResponse) GetNextPageTokenOk() (*string, bool) {
-	if o == nil || IsNil(o.NextPageToken) {
+func (o *DecisionResolutionRequestAnalyst) GetIdOk() (*string, bool) {
+	if o == nil {
 		return nil, false
 	}
-	return o.NextPageToken, true
+	return &o.Id, true
 }
 
-// HasNextPageToken returns a boolean if a field has been set.
-func (o *ScoresSuccessResponse) HasNextPageToken() bool {
-	if o != nil && !IsNil(o.NextPageToken) {
-		return true
+// SetId sets field value
+func (o *DecisionResolutionRequestAnalyst) SetId(v string) {
+	o.Id = v
+}
+
+// GetType returns the Type field value
+func (o *DecisionResolutionRequestAnalyst) GetType() string {
+	if o == nil {
+		var ret string
+		return ret
 	}
 
-	return false
+	return o.Type
 }
 
-// SetNextPageToken gets a reference to the given string and assigns it to the NextPageToken field.
-func (o *ScoresSuccessResponse) SetNextPageToken(v string) {
-	o.NextPageToken = &v
+// GetTypeOk returns a tuple with the Type field value
+// and a boolean to check if the value has been set.
+func (o *DecisionResolutionRequestAnalyst) GetTypeOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.Type, true
 }
 
-func (o ScoresSuccessResponse) MarshalJSON() ([]byte, error) {
+// SetType sets field value
+func (o *DecisionResolutionRequestAnalyst) SetType(v string) {
+	o.Type = v
+}
+
+func (o DecisionResolutionRequestAnalyst) MarshalJSON() ([]byte, error) {
 	toSerialize,err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
@@ -112,21 +105,20 @@ func (o ScoresSuccessResponse) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toSerialize)
 }
 
-func (o ScoresSuccessResponse) ToMap() (map[string]interface{}, error) {
+func (o DecisionResolutionRequestAnalyst) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	toSerialize["scores"] = o.Scores
-	if !IsNil(o.NextPageToken) {
-		toSerialize["nextPageToken"] = o.NextPageToken
-	}
+	toSerialize["id"] = o.Id
+	toSerialize["type"] = o.Type
 	return toSerialize, nil
 }
 
-func (o *ScoresSuccessResponse) UnmarshalJSON(data []byte) (err error) {
+func (o *DecisionResolutionRequestAnalyst) UnmarshalJSON(data []byte) (err error) {
 	// This validates that all required properties are included in the JSON object
 	// by unmarshalling the object into a generic map with string keys and checking
 	// that every required field exists as a key in the generic map.
 	requiredProperties := []string{
-		"scores",
+		"id",
+		"type",
 	}
 
 	allProperties := make(map[string]interface{})
@@ -143,53 +135,53 @@ func (o *ScoresSuccessResponse) UnmarshalJSON(data []byte) (err error) {
 		}
 	}
 
-	varScoresSuccessResponse := _ScoresSuccessResponse{}
+	varDecisionResolutionRequestAnalyst := _DecisionResolutionRequestAnalyst{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
 	decoder.DisallowUnknownFields()
-	err = decoder.Decode(&varScoresSuccessResponse)
+	err = decoder.Decode(&varDecisionResolutionRequestAnalyst)
 
 	if err != nil {
 		return err
 	}
 
-	*o = ScoresSuccessResponse(varScoresSuccessResponse)
+	*o = DecisionResolutionRequestAnalyst(varDecisionResolutionRequestAnalyst)
 
 	return err
 }
 
-type NullableScoresSuccessResponse struct {
-	value *ScoresSuccessResponse
+type NullableDecisionResolutionRequestAnalyst struct {
+	value *DecisionResolutionRequestAnalyst
 	isSet bool
 }
 
-func (v NullableScoresSuccessResponse) Get() *ScoresSuccessResponse {
+func (v NullableDecisionResolutionRequestAnalyst) Get() *DecisionResolutionRequestAnalyst {
 	return v.value
 }
 
-func (v *NullableScoresSuccessResponse) Set(val *ScoresSuccessResponse) {
+func (v *NullableDecisionResolutionRequestAnalyst) Set(val *DecisionResolutionRequestAnalyst) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableScoresSuccessResponse) IsSet() bool {
+func (v NullableDecisionResolutionRequestAnalyst) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableScoresSuccessResponse) Unset() {
+func (v *NullableDecisionResolutionRequestAnalyst) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableScoresSuccessResponse(val *ScoresSuccessResponse) *NullableScoresSuccessResponse {
-	return &NullableScoresSuccessResponse{value: val, isSet: true}
+func NewNullableDecisionResolutionRequestAnalyst(val *DecisionResolutionRequestAnalyst) *NullableDecisionResolutionRequestAnalyst {
+	return &NullableDecisionResolutionRequestAnalyst{value: val, isSet: true}
 }
 
-func (v NullableScoresSuccessResponse) MarshalJSON() ([]byte, error) {
+func (v NullableDecisionResolutionRequestAnalyst) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableScoresSuccessResponse) UnmarshalJSON(src []byte) error {
+func (v *NullableDecisionResolutionRequestAnalyst) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }

@@ -3,7 +3,7 @@ Alogram PayRisk Engine
 
 Alogram PayRisk is an AI-native decision engine built for the speed and  complexity of the modern commerce era. In a high-velocity world where  AI-driven threats evolve in milliseconds, Alogram provides the real-time  adaptability and forensic transparency needed to protect your ecosystem  with total confidence. We solve the challenge of balancing frictionless  growth with regulatory explainability, delivering instant, intelligent  risk orchestration at enterprise scale.  ---   ## Licensing & Terms   Our client libraries and API specifications are open-source under the **Apache License 2.0**  to ensure seamless integration into your tech stack.  Use of the Alogram PayRisk API service is proprietary and governed by our  [Terms of Service](https://alogram.ai/#tos) and your specific **Enterprise Agreement**,  if applicable.  To access the service, you must have: *   A valid Alogram API Key. *   An active subscription or signed Master Service Agreement.  Unauthorized use, including automated scraping or reverse engineering of the  scoring engine, is strictly prohibited.   ---   ## Support & Traceability   Every Alogram API response includes a unique **`x-trace-id`** header.  Please include this ID when contacting [packages@alogram.ai](mailto:packages@alogram.ai)  regarding specific transactions or errors.   ---   ## Specification   The authoritative OpenAPI specification for this version is available for download: **[Download openapi.yaml](https://developers.alogram.ai/openapi.yaml)** | **[Download openapi.json](https://developers.alogram.ai/openapi.json)** 
 
-API version: 0.2.21
+API version: 0.2.23
 Contact: packages@alogram.ai
 */
 
@@ -400,6 +400,213 @@ func (a *RoadmapPreviewAPIService) KycRiskCheckExecute(r ApiKycRiskCheckRequest)
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 429 {
+			var v Problem
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 500 {
+			var v Problem
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiResolveDecisionRequest struct {
+	ctx context.Context
+	ApiService *RoadmapPreviewAPIService
+	idempotencyKey *string
+	tenantId *string
+	decisionResolutionRequest *DecisionResolutionRequest
+	traceId *string
+}
+
+// Lowercase, prefix-free standard idempotency key to prevent duplicate capture/void.
+func (r ApiResolveDecisionRequest) IdempotencyKey(idempotencyKey string) ApiResolveDecisionRequest {
+	r.idempotencyKey = &idempotencyKey
+	return r
+}
+
+// The targeted Alogram Tenant ID partition.
+func (r ApiResolveDecisionRequest) TenantId(tenantId string) ApiResolveDecisionRequest {
+	r.tenantId = &tenantId
+	return r
+}
+
+func (r ApiResolveDecisionRequest) DecisionResolutionRequest(decisionResolutionRequest DecisionResolutionRequest) ApiResolveDecisionRequest {
+	r.decisionResolutionRequest = &decisionResolutionRequest
+	return r
+}
+
+// Lowercase, prefix-free standard distributed trace identifier.
+func (r ApiResolveDecisionRequest) TraceId(traceId string) ApiResolveDecisionRequest {
+	r.traceId = &traceId
+	return r
+}
+
+func (r ApiResolveDecisionRequest) Execute() (*DecisionResolutionResponse, *http.Response, error) {
+	return r.ApiService.ResolveDecisionExecute(r)
+}
+
+/*
+ResolveDecision Resolve Review (Assisted Decisioning & ML Feedback)
+
+> **Coming Soon**: This endpoint is currently in active development.
+Submits an administrative, human-in-the-loop, or autonomous agent decision to resolve a pending fraud review, trigger downstream payment capture/voids, and supply ground-truth feedback labels for ML model retraining.
+
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiResolveDecisionRequest
+*/
+func (a *RoadmapPreviewAPIService) ResolveDecision(ctx context.Context) ApiResolveDecisionRequest {
+	return ApiResolveDecisionRequest{
+		ApiService: a,
+		ctx: ctx,
+	}
+}
+
+// Execute executes the request
+//  @return DecisionResolutionResponse
+func (a *RoadmapPreviewAPIService) ResolveDecisionExecute(r ApiResolveDecisionRequest) (*DecisionResolutionResponse, *http.Response, error) {
+	var (
+		localVarHTTPMethod   = http.MethodPost
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *DecisionResolutionResponse
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "RoadmapPreviewAPIService.ResolveDecision")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/v1/decisions"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+	if r.idempotencyKey == nil {
+		return localVarReturnValue, nil, reportError("idempotencyKey is required and must be specified")
+	}
+	if strlen(*r.idempotencyKey) < 3 {
+		return localVarReturnValue, nil, reportError("idempotencyKey must have at least 3 elements")
+	}
+	if strlen(*r.idempotencyKey) > 128 {
+		return localVarReturnValue, nil, reportError("idempotencyKey must have less than 128 elements")
+	}
+	if r.tenantId == nil {
+		return localVarReturnValue, nil, reportError("tenantId is required and must be specified")
+	}
+	if r.decisionResolutionRequest == nil {
+		return localVarReturnValue, nil, reportError("decisionResolutionRequest is required and must be specified")
+	}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json", "application/problem+json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	if r.traceId != nil {
+		parameterAddToHeaderOrQuery(localVarHeaderParams, "trace-id", r.traceId, "simple", "")
+	}
+	parameterAddToHeaderOrQuery(localVarHeaderParams, "idempotency-key", r.idempotencyKey, "simple", "")
+	parameterAddToHeaderOrQuery(localVarHeaderParams, "tenant-id", r.tenantId, "simple", "")
+	// body params
+	localVarPostBody = r.decisionResolutionRequest
+	if r.ctx != nil {
+		// API Key Authentication
+		if auth, ok := r.ctx.Value(ContextAPIKeys).(map[string]APIKey); ok {
+			if apiKey, ok := auth["ApiKey"]; ok {
+				var key string
+				if apiKey.Prefix != "" {
+					key = apiKey.Prefix + " " + apiKey.Key
+				} else {
+					key = apiKey.Key
+				}
+				localVarHeaderParams["x-api-key"] = key
+			}
+		}
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 400 {
+			var v Problem
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 401 {
+			var v Problem
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 422 {
 			var v Problem
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {

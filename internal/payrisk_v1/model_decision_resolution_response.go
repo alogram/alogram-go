@@ -13,117 +13,119 @@ package payrisk_v1
 
 import (
 	"encoding/json"
+	"time"
 	"bytes"
 	"fmt"
 )
 
-// checks if the SignalsInteractionVariant type satisfies the MappedNullable interface at compile time
-var _ MappedNullable = &SignalsInteractionVariant{}
+// checks if the DecisionResolutionResponse type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &DecisionResolutionResponse{}
 
-// SignalsInteractionVariant Interaction batch signal variant (one or more user interactions).
-type SignalsInteractionVariant struct {
-	// Value for interaction signals.
-	SignalType string `json:"signalType"`
-	Entities EntityIds `json:"entities"`
-	// One or more interactions associated with the signal.
-	Interactions []Interaction `json:"interactions"`
+// DecisionResolutionResponse struct for DecisionResolutionResponse
+type DecisionResolutionResponse struct {
+	// Indicates if the decision was successfully resolved and persisted.
+	Ok bool `json:"ok"`
+	// Operational summary message.
+	Message string `json:"message"`
+	// ISO-8601 timestamp of resolution completion.
+	ResolvedAt time.Time `json:"resolvedAt"`
 }
 
-type _SignalsInteractionVariant SignalsInteractionVariant
+type _DecisionResolutionResponse DecisionResolutionResponse
 
-// NewSignalsInteractionVariant instantiates a new SignalsInteractionVariant object
+// NewDecisionResolutionResponse instantiates a new DecisionResolutionResponse object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewSignalsInteractionVariant(signalType string, entities EntityIds, interactions []Interaction) *SignalsInteractionVariant {
-	this := SignalsInteractionVariant{}
-	this.SignalType = signalType
-	this.Entities = entities
-	this.Interactions = interactions
+func NewDecisionResolutionResponse(ok bool, message string, resolvedAt time.Time) *DecisionResolutionResponse {
+	this := DecisionResolutionResponse{}
+	this.Ok = ok
+	this.Message = message
+	this.ResolvedAt = resolvedAt
 	return &this
 }
 
-// NewSignalsInteractionVariantWithDefaults instantiates a new SignalsInteractionVariant object
+// NewDecisionResolutionResponseWithDefaults instantiates a new DecisionResolutionResponse object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewSignalsInteractionVariantWithDefaults() *SignalsInteractionVariant {
-	this := SignalsInteractionVariant{}
+func NewDecisionResolutionResponseWithDefaults() *DecisionResolutionResponse {
+	this := DecisionResolutionResponse{}
 	return &this
 }
 
-// GetSignalType returns the SignalType field value
-func (o *SignalsInteractionVariant) GetSignalType() string {
+// GetOk returns the Ok field value
+func (o *DecisionResolutionResponse) GetOk() bool {
+	if o == nil {
+		var ret bool
+		return ret
+	}
+
+	return o.Ok
+}
+
+// GetOkOk returns a tuple with the Ok field value
+// and a boolean to check if the value has been set.
+func (o *DecisionResolutionResponse) GetOkOk() (*bool, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.Ok, true
+}
+
+// SetOk sets field value
+func (o *DecisionResolutionResponse) SetOk(v bool) {
+	o.Ok = v
+}
+
+// GetMessage returns the Message field value
+func (o *DecisionResolutionResponse) GetMessage() string {
 	if o == nil {
 		var ret string
 		return ret
 	}
 
-	return o.SignalType
+	return o.Message
 }
 
-// GetSignalTypeOk returns a tuple with the SignalType field value
+// GetMessageOk returns a tuple with the Message field value
 // and a boolean to check if the value has been set.
-func (o *SignalsInteractionVariant) GetSignalTypeOk() (*string, bool) {
+func (o *DecisionResolutionResponse) GetMessageOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
-	return &o.SignalType, true
+	return &o.Message, true
 }
 
-// SetSignalType sets field value
-func (o *SignalsInteractionVariant) SetSignalType(v string) {
-	o.SignalType = v
+// SetMessage sets field value
+func (o *DecisionResolutionResponse) SetMessage(v string) {
+	o.Message = v
 }
 
-// GetEntities returns the Entities field value
-func (o *SignalsInteractionVariant) GetEntities() EntityIds {
+// GetResolvedAt returns the ResolvedAt field value
+func (o *DecisionResolutionResponse) GetResolvedAt() time.Time {
 	if o == nil {
-		var ret EntityIds
+		var ret time.Time
 		return ret
 	}
 
-	return o.Entities
+	return o.ResolvedAt
 }
 
-// GetEntitiesOk returns a tuple with the Entities field value
+// GetResolvedAtOk returns a tuple with the ResolvedAt field value
 // and a boolean to check if the value has been set.
-func (o *SignalsInteractionVariant) GetEntitiesOk() (*EntityIds, bool) {
+func (o *DecisionResolutionResponse) GetResolvedAtOk() (*time.Time, bool) {
 	if o == nil {
 		return nil, false
 	}
-	return &o.Entities, true
+	return &o.ResolvedAt, true
 }
 
-// SetEntities sets field value
-func (o *SignalsInteractionVariant) SetEntities(v EntityIds) {
-	o.Entities = v
+// SetResolvedAt sets field value
+func (o *DecisionResolutionResponse) SetResolvedAt(v time.Time) {
+	o.ResolvedAt = v
 }
 
-// GetInteractions returns the Interactions field value
-func (o *SignalsInteractionVariant) GetInteractions() []Interaction {
-	if o == nil {
-		var ret []Interaction
-		return ret
-	}
-
-	return o.Interactions
-}
-
-// GetInteractionsOk returns a tuple with the Interactions field value
-// and a boolean to check if the value has been set.
-func (o *SignalsInteractionVariant) GetInteractionsOk() ([]Interaction, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return o.Interactions, true
-}
-
-// SetInteractions sets field value
-func (o *SignalsInteractionVariant) SetInteractions(v []Interaction) {
-	o.Interactions = v
-}
-
-func (o SignalsInteractionVariant) MarshalJSON() ([]byte, error) {
+func (o DecisionResolutionResponse) MarshalJSON() ([]byte, error) {
 	toSerialize,err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
@@ -131,22 +133,22 @@ func (o SignalsInteractionVariant) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toSerialize)
 }
 
-func (o SignalsInteractionVariant) ToMap() (map[string]interface{}, error) {
+func (o DecisionResolutionResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	toSerialize["signalType"] = o.SignalType
-	toSerialize["entities"] = o.Entities
-	toSerialize["interactions"] = o.Interactions
+	toSerialize["ok"] = o.Ok
+	toSerialize["message"] = o.Message
+	toSerialize["resolvedAt"] = o.ResolvedAt
 	return toSerialize, nil
 }
 
-func (o *SignalsInteractionVariant) UnmarshalJSON(data []byte) (err error) {
+func (o *DecisionResolutionResponse) UnmarshalJSON(data []byte) (err error) {
 	// This validates that all required properties are included in the JSON object
 	// by unmarshalling the object into a generic map with string keys and checking
 	// that every required field exists as a key in the generic map.
 	requiredProperties := []string{
-		"signalType",
-		"entities",
-		"interactions",
+		"ok",
+		"message",
+		"resolvedAt",
 	}
 
 	allProperties := make(map[string]interface{})
@@ -163,53 +165,53 @@ func (o *SignalsInteractionVariant) UnmarshalJSON(data []byte) (err error) {
 		}
 	}
 
-	varSignalsInteractionVariant := _SignalsInteractionVariant{}
+	varDecisionResolutionResponse := _DecisionResolutionResponse{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
 	decoder.DisallowUnknownFields()
-	err = decoder.Decode(&varSignalsInteractionVariant)
+	err = decoder.Decode(&varDecisionResolutionResponse)
 
 	if err != nil {
 		return err
 	}
 
-	*o = SignalsInteractionVariant(varSignalsInteractionVariant)
+	*o = DecisionResolutionResponse(varDecisionResolutionResponse)
 
 	return err
 }
 
-type NullableSignalsInteractionVariant struct {
-	value *SignalsInteractionVariant
+type NullableDecisionResolutionResponse struct {
+	value *DecisionResolutionResponse
 	isSet bool
 }
 
-func (v NullableSignalsInteractionVariant) Get() *SignalsInteractionVariant {
+func (v NullableDecisionResolutionResponse) Get() *DecisionResolutionResponse {
 	return v.value
 }
 
-func (v *NullableSignalsInteractionVariant) Set(val *SignalsInteractionVariant) {
+func (v *NullableDecisionResolutionResponse) Set(val *DecisionResolutionResponse) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableSignalsInteractionVariant) IsSet() bool {
+func (v NullableDecisionResolutionResponse) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableSignalsInteractionVariant) Unset() {
+func (v *NullableDecisionResolutionResponse) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableSignalsInteractionVariant(val *SignalsInteractionVariant) *NullableSignalsInteractionVariant {
-	return &NullableSignalsInteractionVariant{value: val, isSet: true}
+func NewNullableDecisionResolutionResponse(val *DecisionResolutionResponse) *NullableDecisionResolutionResponse {
+	return &NullableDecisionResolutionResponse{value: val, isSet: true}
 }
 
-func (v NullableSignalsInteractionVariant) MarshalJSON() ([]byte, error) {
+func (v NullableDecisionResolutionResponse) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableSignalsInteractionVariant) UnmarshalJSON(src []byte) error {
+func (v *NullableDecisionResolutionResponse) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }

@@ -146,8 +146,8 @@ func (c *AlogramRiskClient) CheckRisk(ctx context.Context, req payrisk_v1.CheckR
 
 	for i := 0; i < 3; i++ {
 		result, httpResp, err = c.api.RiskScoringAPI.RiskCheck(ctx).
-			XIdempotencyKey(ik).
-			XTraceId(tid).
+			IdempotencyKey(ik).
+			TraceId(tid).
 			CheckRequest(req).
 			Execute()
 
@@ -242,8 +242,8 @@ func (c *baseClient) ingestSignals(ctx context.Context, req payrisk_v1.SignalsRe
 	defer span.End()
 
 	_, httpResp, err := c.api.SignalIntelligenceAPI.IngestSignals(ctx).
-		XIdempotencyKey(ik).
-		XTraceId(tid).
+		IdempotencyKey(ik).
+		TraceId(tid).
 		SignalsRequest(req).
 		Execute()
 
@@ -272,8 +272,8 @@ func (c *AlogramRiskClient) IngestEvent(ctx context.Context, event payrisk_v1.Pa
 	defer span.End()
 
 	_, httpResp, err := c.api.SignalIntelligenceAPI.IngestPaymentEvent(ctx).
-		XIdempotencyKey(ik).
-		XTraceId(tid).
+		IdempotencyKey(ik).
+		TraceId(tid).
 		PaymentEvent(event).
 		Execute()
 

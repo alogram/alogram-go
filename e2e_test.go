@@ -133,7 +133,7 @@ func TestE2E_Simulator(t *testing.T) {
 
 	_, _, err := client.SignalIntelligenceAPI.IngestSignals(authCtx).
 		SignalsRequest(sigReq).
-		XIdempotencyKey(fmt.Sprintf("idk_%032x", time.Now().UnixNano())).
+		IdempotencyKey(fmt.Sprintf("idk_%032x", time.Now().UnixNano())).
 		Execute()
 	if err != nil {
 		t.Fatalf("🔥 Signals ingestion failed: %v", err)
@@ -159,7 +159,7 @@ func TestE2E_Simulator(t *testing.T) {
 	}
 	decision, _, err := client.RiskScoringAPI.RiskCheck(authCtx).
 		CheckRequest(checkReq).
-		XIdempotencyKey(fmt.Sprintf("idk_%032x", time.Now().UnixNano())).
+		IdempotencyKey(fmt.Sprintf("idk_%032x", time.Now().UnixNano())).
 		Execute()
 	if err != nil {
 		t.Fatalf("🔥 Risk check failed: %v", err)
@@ -184,7 +184,7 @@ func TestE2E_Simulator(t *testing.T) {
 		}
 		_, _, err = client.SignalIntelligenceAPI.IngestPaymentEvent(authCtx).
 			PaymentEvent(eventAuth).
-			XIdempotencyKey(fmt.Sprintf("idk_%032x", time.Now().UnixNano())).
+			IdempotencyKey(fmt.Sprintf("idk_%032x", time.Now().UnixNano())).
 			Execute()
 		if err != nil {
 			t.Fatalf("🔥 Auth ingestion failed: %v", err)
@@ -207,7 +207,7 @@ func TestE2E_Simulator(t *testing.T) {
 		}
 		_, _, err = client.SignalIntelligenceAPI.IngestPaymentEvent(authCtx).
 			PaymentEvent(eventCap).
-			XIdempotencyKey(fmt.Sprintf("idk_%032x", time.Now().UnixNano())).
+			IdempotencyKey(fmt.Sprintf("idk_%032x", time.Now().UnixNano())).
 			Execute()
 		if err != nil {
 			t.Fatalf("🔥 Capture ingestion failed: %v", err)

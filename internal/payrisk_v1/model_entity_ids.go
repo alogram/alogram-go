@@ -3,7 +3,7 @@ Alogram PayRisk Engine
 
 Alogram PayRisk is an AI-native decision engine built for the speed and  complexity of the modern commerce era. In a high-velocity world where  AI-driven threats evolve in milliseconds, Alogram provides the real-time  adaptability and forensic transparency needed to protect your ecosystem  with total confidence. We solve the challenge of balancing frictionless  growth with regulatory explainability, delivering instant, intelligent  risk orchestration at enterprise scale.  ---   ## Licensing & Terms   Our client libraries and API specifications are open-source under the **Apache License 2.0**  to ensure seamless integration into your tech stack.  Use of the Alogram PayRisk API service is proprietary and governed by our  [Terms of Service](https://alogram.ai/#tos) and your specific **Enterprise Agreement**,  if applicable.  To access the service, you must have: *   A valid Alogram API Key. *   An active subscription or signed Master Service Agreement.  Unauthorized use, including automated scraping or reverse engineering of the  scoring engine, is strictly prohibited.   ---   ## Support & Traceability   Every Alogram API response includes a unique **`x-trace-id`** header.  Please include this ID when contacting [packages@alogram.ai](mailto:packages@alogram.ai)  regarding specific transactions or errors.   ---   ## Specification   The authoritative OpenAPI specification for this version is available for download: **[Download openapi.yaml](https://developers.alogram.ai/openapi.yaml)** | **[Download openapi.json](https://developers.alogram.ai/openapi.json)** 
 
-API version: 0.2.23
+API version: 0.2.24
 Contact: packages@alogram.ai
 */
 
@@ -27,7 +27,8 @@ type EntityIds struct {
 	// Canonical ID for the client’s end user / consumer (account holder).  Opaque, immutable, lowercase. Supports \"ecid_\" slugs (Legacy) or \"cus_\" hex (Preferred). 
 	EndCustomerId *string `json:"endCustomerId,omitempty" validate:"regexp=^(ecid_[a-z0-9\\\\-_]{2,96}|cus_[a-f0-9]{32})$"`
 	// Canonical ID for a Tenant Operator (staff/automation) holding membership in the platform.  Opaque, immutable, lowercase. Supports \"mid_\" slugs (Legacy) or \"op_\" hex (Preferred). 
-	OperatorId *string `json:"operatorId,omitempty" validate:"regexp=^(mid_[a-z0-9_-]{2,96}|op_[a-f0-9]{32})$"`
+	OperatorId *string `json:"operatorId,omitempty" validate:"regexp=^(mid_[a-z0-9_-]{2,96}|op_([a-f0-9]{32}|system|[a-z0-9_-]{2,64}))$"`
+	OperatorType *OperatorType `json:"operatorType,omitempty"`
 	Auth *AuthContext `json:"auth,omitempty"`
 	// Canonical ID for a marketplace product edition or billing SKU.  Always follows the Fortress-36 (sku_ + 32 hex) format. 
 	SkuId *string `json:"skuId,omitempty" validate:"regexp=^sku_[a-f0-9]{32}$"`
@@ -195,6 +196,38 @@ func (o *EntityIds) HasOperatorId() bool {
 // SetOperatorId gets a reference to the given string and assigns it to the OperatorId field.
 func (o *EntityIds) SetOperatorId(v string) {
 	o.OperatorId = &v
+}
+
+// GetOperatorType returns the OperatorType field value if set, zero value otherwise.
+func (o *EntityIds) GetOperatorType() OperatorType {
+	if o == nil || IsNil(o.OperatorType) {
+		var ret OperatorType
+		return ret
+	}
+	return *o.OperatorType
+}
+
+// GetOperatorTypeOk returns a tuple with the OperatorType field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *EntityIds) GetOperatorTypeOk() (*OperatorType, bool) {
+	if o == nil || IsNil(o.OperatorType) {
+		return nil, false
+	}
+	return o.OperatorType, true
+}
+
+// HasOperatorType returns a boolean if a field has been set.
+func (o *EntityIds) HasOperatorType() bool {
+	if o != nil && !IsNil(o.OperatorType) {
+		return true
+	}
+
+	return false
+}
+
+// SetOperatorType gets a reference to the given OperatorType and assigns it to the OperatorType field.
+func (o *EntityIds) SetOperatorType(v OperatorType) {
+	o.OperatorType = &v
 }
 
 // GetAuth returns the Auth field value if set, zero value otherwise.
@@ -602,6 +635,9 @@ func (o EntityIds) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.OperatorId) {
 		toSerialize["operatorId"] = o.OperatorId
+	}
+	if !IsNil(o.OperatorType) {
+		toSerialize["operatorType"] = o.OperatorType
 	}
 	if !IsNil(o.Auth) {
 		toSerialize["auth"] = o.Auth

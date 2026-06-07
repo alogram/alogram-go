@@ -16,62 +16,54 @@ import (
 	"fmt"
 )
 
-// EntryMethodEnum The method used to capture card data.
-type EntryMethodEnum string
+// OperatorType Semantic classification of the platform operator performing the action. Opaque, immutable, lowercase. Helps downstream ETLs partition telemetry cleanly. 
+type OperatorType string
 
-// List of EntryMethodEnum
+// List of OperatorType
 const (
-	ENTRYMETHODENUM_CHIP EntryMethodEnum = "chip"
-	ENTRYMETHODENUM_CONTACTLESS EntryMethodEnum = "contactless"
-	ENTRYMETHODENUM_MAGSTRIPE EntryMethodEnum = "magstripe"
-	ENTRYMETHODENUM_MANUAL_KEYED EntryMethodEnum = "manual_keyed"
-	ENTRYMETHODENUM_CARD_ON_FILE EntryMethodEnum = "card_on_file"
-	ENTRYMETHODENUM_WALLET_TOKEN EntryMethodEnum = "wallet_token"
-	ENTRYMETHODENUM_NETWORK_TOKEN EntryMethodEnum = "network_token"
+	OPERATORTYPE_HUMAN OperatorType = "human"
+	OPERATORTYPE_SYSTEM OperatorType = "system"
+	OPERATORTYPE_AUTONOMOUS_AGENT OperatorType = "autonomous_agent"
 )
 
-// All allowed values of EntryMethodEnum enum
-var AllowedEntryMethodEnumEnumValues = []EntryMethodEnum{
-	"chip",
-	"contactless",
-	"magstripe",
-	"manual_keyed",
-	"card_on_file",
-	"wallet_token",
-	"network_token",
+// All allowed values of OperatorType enum
+var AllowedOperatorTypeEnumValues = []OperatorType{
+	"human",
+	"system",
+	"autonomous_agent",
 }
 
-func (v *EntryMethodEnum) UnmarshalJSON(src []byte) error {
+func (v *OperatorType) UnmarshalJSON(src []byte) error {
 	var value string
 	err := json.Unmarshal(src, &value)
 	if err != nil {
 		return err
 	}
-	enumTypeValue := EntryMethodEnum(value)
-	for _, existing := range AllowedEntryMethodEnumEnumValues {
+	enumTypeValue := OperatorType(value)
+	for _, existing := range AllowedOperatorTypeEnumValues {
 		if existing == enumTypeValue {
 			*v = enumTypeValue
 			return nil
 		}
 	}
 
-	return fmt.Errorf("%+v is not a valid EntryMethodEnum", value)
+	return fmt.Errorf("%+v is not a valid OperatorType", value)
 }
 
-// NewEntryMethodEnumFromValue returns a pointer to a valid EntryMethodEnum
+// NewOperatorTypeFromValue returns a pointer to a valid OperatorType
 // for the value passed as argument, or an error if the value passed is not allowed by the enum
-func NewEntryMethodEnumFromValue(v string) (*EntryMethodEnum, error) {
-	ev := EntryMethodEnum(v)
+func NewOperatorTypeFromValue(v string) (*OperatorType, error) {
+	ev := OperatorType(v)
 	if ev.IsValid() {
 		return &ev, nil
 	} else {
-		return nil, fmt.Errorf("invalid value '%v' for EntryMethodEnum: valid values are %v", v, AllowedEntryMethodEnumEnumValues)
+		return nil, fmt.Errorf("invalid value '%v' for OperatorType: valid values are %v", v, AllowedOperatorTypeEnumValues)
 	}
 }
 
 // IsValid return true if the value is valid for the enum, false otherwise
-func (v EntryMethodEnum) IsValid() bool {
-	for _, existing := range AllowedEntryMethodEnumEnumValues {
+func (v OperatorType) IsValid() bool {
+	for _, existing := range AllowedOperatorTypeEnumValues {
 		if existing == v {
 			return true
 		}
@@ -79,43 +71,43 @@ func (v EntryMethodEnum) IsValid() bool {
 	return false
 }
 
-// Ptr returns reference to EntryMethodEnum value
-func (v EntryMethodEnum) Ptr() *EntryMethodEnum {
+// Ptr returns reference to OperatorType value
+func (v OperatorType) Ptr() *OperatorType {
 	return &v
 }
 
-type NullableEntryMethodEnum struct {
-	value *EntryMethodEnum
+type NullableOperatorType struct {
+	value *OperatorType
 	isSet bool
 }
 
-func (v NullableEntryMethodEnum) Get() *EntryMethodEnum {
+func (v NullableOperatorType) Get() *OperatorType {
 	return v.value
 }
 
-func (v *NullableEntryMethodEnum) Set(val *EntryMethodEnum) {
+func (v *NullableOperatorType) Set(val *OperatorType) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableEntryMethodEnum) IsSet() bool {
+func (v NullableOperatorType) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableEntryMethodEnum) Unset() {
+func (v *NullableOperatorType) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableEntryMethodEnum(val *EntryMethodEnum) *NullableEntryMethodEnum {
-	return &NullableEntryMethodEnum{value: val, isSet: true}
+func NewNullableOperatorType(val *OperatorType) *NullableOperatorType {
+	return &NullableOperatorType{value: val, isSet: true}
 }
 
-func (v NullableEntryMethodEnum) MarshalJSON() ([]byte, error) {
+func (v NullableOperatorType) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableEntryMethodEnum) UnmarshalJSON(src []byte) error {
+func (v *NullableOperatorType) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }

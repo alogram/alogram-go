@@ -3,7 +3,7 @@ Alogram PayRisk Engine
 
 Alogram PayRisk is an AI-native decision engine built for the speed and  complexity of the modern commerce era. In a high-velocity world where  AI-driven threats evolve in milliseconds, Alogram provides the real-time  adaptability and forensic transparency needed to protect your ecosystem  with total confidence. We solve the challenge of balancing frictionless  growth with regulatory explainability, delivering instant, intelligent  risk orchestration at enterprise scale.  ---   ## Licensing & Terms   Our client libraries and API specifications are open-source under the **Apache License 2.0**  to ensure seamless integration into your tech stack.  Use of the Alogram PayRisk API service is proprietary and governed by our  [Terms of Service](https://alogram.ai/#tos) and your specific **Enterprise Agreement**,  if applicable.  To access the service, you must have: *   A valid Alogram API Key. *   An active subscription or signed Master Service Agreement.  Unauthorized use, including automated scraping or reverse engineering of the  scoring engine, is strictly prohibited.   ---   ## Support & Traceability   Every Alogram API response includes a unique **`x-trace-id`** header.  Please include this ID when contacting [packages@alogram.ai](mailto:packages@alogram.ai)  regarding specific transactions or errors.   ---   ## Specification   The authoritative OpenAPI specification for this version is available for download: **[Download openapi.yaml](https://developers.alogram.ai/openapi.yaml)** | **[Download openapi.json](https://developers.alogram.ai/openapi.json)** 
 
-API version: 0.2.23
+API version: 0.2.24
 Contact: packages@alogram.ai
 */
 
@@ -26,15 +26,15 @@ type RoadmapPreviewAPIService service
 type ApiAccountRiskCheckRequest struct {
 	ctx context.Context
 	ApiService *RoadmapPreviewAPIService
-	xIdempotencyKey *string
+	idempotencyKey *string
 	accountCheckRequest *AccountCheckRequest
-	xTraceId *string
-	xAlogramAgentManifest *AgentManifest
+	traceId *string
+	alogramAgentManifest *AgentManifest
 }
 
 // Unique Idempotency-Key sent in the POST request etc.
-func (r ApiAccountRiskCheckRequest) XIdempotencyKey(xIdempotencyKey string) ApiAccountRiskCheckRequest {
-	r.xIdempotencyKey = &xIdempotencyKey
+func (r ApiAccountRiskCheckRequest) IdempotencyKey(idempotencyKey string) ApiAccountRiskCheckRequest {
+	r.idempotencyKey = &idempotencyKey
 	return r
 }
 
@@ -44,14 +44,14 @@ func (r ApiAccountRiskCheckRequest) AccountCheckRequest(accountCheckRequest Acco
 }
 
 // Echoed or generated trace ID for tracking requests.
-func (r ApiAccountRiskCheckRequest) XTraceId(xTraceId string) ApiAccountRiskCheckRequest {
-	r.xTraceId = &xTraceId
+func (r ApiAccountRiskCheckRequest) TraceId(traceId string) ApiAccountRiskCheckRequest {
+	r.traceId = &traceId
 	return r
 }
 
 // JSON-encoded AgentManifest for autonomous shopping agents.  Required for machine-to-machine trust validation (UCP/MCP). 
-func (r ApiAccountRiskCheckRequest) XAlogramAgentManifest(xAlogramAgentManifest AgentManifest) ApiAccountRiskCheckRequest {
-	r.xAlogramAgentManifest = &xAlogramAgentManifest
+func (r ApiAccountRiskCheckRequest) AlogramAgentManifest(alogramAgentManifest AgentManifest) ApiAccountRiskCheckRequest {
+	r.alogramAgentManifest = &alogramAgentManifest
 	return r
 }
 
@@ -96,14 +96,14 @@ func (a *RoadmapPreviewAPIService) AccountRiskCheckExecute(r ApiAccountRiskCheck
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
-	if r.xIdempotencyKey == nil {
-		return localVarReturnValue, nil, reportError("xIdempotencyKey is required and must be specified")
+	if r.idempotencyKey == nil {
+		return localVarReturnValue, nil, reportError("idempotencyKey is required and must be specified")
 	}
-	if strlen(*r.xIdempotencyKey) < 36 {
-		return localVarReturnValue, nil, reportError("xIdempotencyKey must have at least 36 elements")
+	if strlen(*r.idempotencyKey) < 36 {
+		return localVarReturnValue, nil, reportError("idempotencyKey must have at least 36 elements")
 	}
-	if strlen(*r.xIdempotencyKey) > 36 {
-		return localVarReturnValue, nil, reportError("xIdempotencyKey must have less than 36 elements")
+	if strlen(*r.idempotencyKey) > 36 {
+		return localVarReturnValue, nil, reportError("idempotencyKey must have less than 36 elements")
 	}
 	if r.accountCheckRequest == nil {
 		return localVarReturnValue, nil, reportError("accountCheckRequest is required and must be specified")
@@ -126,12 +126,12 @@ func (a *RoadmapPreviewAPIService) AccountRiskCheckExecute(r ApiAccountRiskCheck
 	if localVarHTTPHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
-	if r.xTraceId != nil {
-		parameterAddToHeaderOrQuery(localVarHeaderParams, "x-trace-id", r.xTraceId, "simple", "")
+	if r.traceId != nil {
+		parameterAddToHeaderOrQuery(localVarHeaderParams, "trace-id", r.traceId, "simple", "")
 	}
-	parameterAddToHeaderOrQuery(localVarHeaderParams, "x-idempotency-key", r.xIdempotencyKey, "", "")
-	if r.xAlogramAgentManifest != nil {
-		parameterAddToHeaderOrQuery(localVarHeaderParams, "x-alogram-agent-manifest", r.xAlogramAgentManifest, "", "")
+	parameterAddToHeaderOrQuery(localVarHeaderParams, "idempotency-key", r.idempotencyKey, "", "")
+	if r.alogramAgentManifest != nil {
+		parameterAddToHeaderOrQuery(localVarHeaderParams, "alogram-agent-manifest", r.alogramAgentManifest, "", "")
 	}
 	// body params
 	localVarPostBody = r.accountCheckRequest
@@ -232,15 +232,15 @@ func (a *RoadmapPreviewAPIService) AccountRiskCheckExecute(r ApiAccountRiskCheck
 type ApiKycRiskCheckRequest struct {
 	ctx context.Context
 	ApiService *RoadmapPreviewAPIService
-	xIdempotencyKey *string
+	idempotencyKey *string
 	kycCheckRequest *KycCheckRequest
-	xTraceId *string
-	xAlogramAgentManifest *AgentManifest
+	traceId *string
+	alogramAgentManifest *AgentManifest
 }
 
 // Unique Idempotency-Key sent in the POST request etc.
-func (r ApiKycRiskCheckRequest) XIdempotencyKey(xIdempotencyKey string) ApiKycRiskCheckRequest {
-	r.xIdempotencyKey = &xIdempotencyKey
+func (r ApiKycRiskCheckRequest) IdempotencyKey(idempotencyKey string) ApiKycRiskCheckRequest {
+	r.idempotencyKey = &idempotencyKey
 	return r
 }
 
@@ -250,14 +250,14 @@ func (r ApiKycRiskCheckRequest) KycCheckRequest(kycCheckRequest KycCheckRequest)
 }
 
 // Echoed or generated trace ID for tracking requests.
-func (r ApiKycRiskCheckRequest) XTraceId(xTraceId string) ApiKycRiskCheckRequest {
-	r.xTraceId = &xTraceId
+func (r ApiKycRiskCheckRequest) TraceId(traceId string) ApiKycRiskCheckRequest {
+	r.traceId = &traceId
 	return r
 }
 
 // JSON-encoded AgentManifest for autonomous shopping agents.  Required for machine-to-machine trust validation (UCP/MCP). 
-func (r ApiKycRiskCheckRequest) XAlogramAgentManifest(xAlogramAgentManifest AgentManifest) ApiKycRiskCheckRequest {
-	r.xAlogramAgentManifest = &xAlogramAgentManifest
+func (r ApiKycRiskCheckRequest) AlogramAgentManifest(alogramAgentManifest AgentManifest) ApiKycRiskCheckRequest {
+	r.alogramAgentManifest = &alogramAgentManifest
 	return r
 }
 
@@ -302,14 +302,14 @@ func (a *RoadmapPreviewAPIService) KycRiskCheckExecute(r ApiKycRiskCheckRequest)
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
-	if r.xIdempotencyKey == nil {
-		return localVarReturnValue, nil, reportError("xIdempotencyKey is required and must be specified")
+	if r.idempotencyKey == nil {
+		return localVarReturnValue, nil, reportError("idempotencyKey is required and must be specified")
 	}
-	if strlen(*r.xIdempotencyKey) < 36 {
-		return localVarReturnValue, nil, reportError("xIdempotencyKey must have at least 36 elements")
+	if strlen(*r.idempotencyKey) < 36 {
+		return localVarReturnValue, nil, reportError("idempotencyKey must have at least 36 elements")
 	}
-	if strlen(*r.xIdempotencyKey) > 36 {
-		return localVarReturnValue, nil, reportError("xIdempotencyKey must have less than 36 elements")
+	if strlen(*r.idempotencyKey) > 36 {
+		return localVarReturnValue, nil, reportError("idempotencyKey must have less than 36 elements")
 	}
 	if r.kycCheckRequest == nil {
 		return localVarReturnValue, nil, reportError("kycCheckRequest is required and must be specified")
@@ -332,12 +332,12 @@ func (a *RoadmapPreviewAPIService) KycRiskCheckExecute(r ApiKycRiskCheckRequest)
 	if localVarHTTPHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
-	if r.xTraceId != nil {
-		parameterAddToHeaderOrQuery(localVarHeaderParams, "x-trace-id", r.xTraceId, "simple", "")
+	if r.traceId != nil {
+		parameterAddToHeaderOrQuery(localVarHeaderParams, "trace-id", r.traceId, "simple", "")
 	}
-	parameterAddToHeaderOrQuery(localVarHeaderParams, "x-idempotency-key", r.xIdempotencyKey, "", "")
-	if r.xAlogramAgentManifest != nil {
-		parameterAddToHeaderOrQuery(localVarHeaderParams, "x-alogram-agent-manifest", r.xAlogramAgentManifest, "", "")
+	parameterAddToHeaderOrQuery(localVarHeaderParams, "idempotency-key", r.idempotencyKey, "", "")
+	if r.alogramAgentManifest != nil {
+		parameterAddToHeaderOrQuery(localVarHeaderParams, "alogram-agent-manifest", r.alogramAgentManifest, "", "")
 	}
 	// body params
 	localVarPostBody = r.kycCheckRequest

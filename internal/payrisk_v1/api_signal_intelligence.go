@@ -3,7 +3,7 @@ Alogram PayRisk Engine
 
 Alogram PayRisk is an AI-native decision engine built for the speed and  complexity of the modern commerce era. In a high-velocity world where  AI-driven threats evolve in milliseconds, Alogram provides the real-time  adaptability and forensic transparency needed to protect your ecosystem  with total confidence. We solve the challenge of balancing frictionless  growth with regulatory explainability, delivering instant, intelligent  risk orchestration at enterprise scale.  ---   ## Licensing & Terms   Our client libraries and API specifications are open-source under the **Apache License 2.0**  to ensure seamless integration into your tech stack.  Use of the Alogram PayRisk API service is proprietary and governed by our  [Terms of Service](https://alogram.ai/#tos) and your specific **Enterprise Agreement**,  if applicable.  To access the service, you must have: *   A valid Alogram API Key. *   An active subscription or signed Master Service Agreement.  Unauthorized use, including automated scraping or reverse engineering of the  scoring engine, is strictly prohibited.   ---   ## Support & Traceability   Every Alogram API response includes a unique **`x-trace-id`** header.  Please include this ID when contacting [packages@alogram.ai](mailto:packages@alogram.ai)  regarding specific transactions or errors.   ---   ## Specification   The authoritative OpenAPI specification for this version is available for download: **[Download openapi.yaml](https://developers.alogram.ai/openapi.yaml)** | **[Download openapi.json](https://developers.alogram.ai/openapi.json)** 
 
-API version: 0.2.23
+API version: 0.2.24
 Contact: packages@alogram.ai
 */
 
@@ -26,15 +26,15 @@ type SignalIntelligenceAPIService service
 type ApiIngestPaymentEventRequest struct {
 	ctx context.Context
 	ApiService *SignalIntelligenceAPIService
-	xIdempotencyKey *string
+	idempotencyKey *string
 	paymentEvent *PaymentEvent
-	xTraceId *string
-	xAlogramAgentManifest *AgentManifest
+	traceId *string
+	alogramAgentManifest *AgentManifest
 }
 
 // Unique Idempotency-Key sent in the POST request etc.
-func (r ApiIngestPaymentEventRequest) XIdempotencyKey(xIdempotencyKey string) ApiIngestPaymentEventRequest {
-	r.xIdempotencyKey = &xIdempotencyKey
+func (r ApiIngestPaymentEventRequest) IdempotencyKey(idempotencyKey string) ApiIngestPaymentEventRequest {
+	r.idempotencyKey = &idempotencyKey
 	return r
 }
 
@@ -44,14 +44,14 @@ func (r ApiIngestPaymentEventRequest) PaymentEvent(paymentEvent PaymentEvent) Ap
 }
 
 // Echoed or generated trace ID for tracking requests.
-func (r ApiIngestPaymentEventRequest) XTraceId(xTraceId string) ApiIngestPaymentEventRequest {
-	r.xTraceId = &xTraceId
+func (r ApiIngestPaymentEventRequest) TraceId(traceId string) ApiIngestPaymentEventRequest {
+	r.traceId = &traceId
 	return r
 }
 
 // JSON-encoded AgentManifest for autonomous shopping agents.  Required for machine-to-machine trust validation (UCP/MCP). 
-func (r ApiIngestPaymentEventRequest) XAlogramAgentManifest(xAlogramAgentManifest AgentManifest) ApiIngestPaymentEventRequest {
-	r.xAlogramAgentManifest = &xAlogramAgentManifest
+func (r ApiIngestPaymentEventRequest) AlogramAgentManifest(alogramAgentManifest AgentManifest) ApiIngestPaymentEventRequest {
+	r.alogramAgentManifest = &alogramAgentManifest
 	return r
 }
 
@@ -92,14 +92,14 @@ func (a *SignalIntelligenceAPIService) IngestPaymentEventExecute(r ApiIngestPaym
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
-	if r.xIdempotencyKey == nil {
-		return localVarReturnValue, nil, reportError("xIdempotencyKey is required and must be specified")
+	if r.idempotencyKey == nil {
+		return localVarReturnValue, nil, reportError("idempotencyKey is required and must be specified")
 	}
-	if strlen(*r.xIdempotencyKey) < 36 {
-		return localVarReturnValue, nil, reportError("xIdempotencyKey must have at least 36 elements")
+	if strlen(*r.idempotencyKey) < 36 {
+		return localVarReturnValue, nil, reportError("idempotencyKey must have at least 36 elements")
 	}
-	if strlen(*r.xIdempotencyKey) > 36 {
-		return localVarReturnValue, nil, reportError("xIdempotencyKey must have less than 36 elements")
+	if strlen(*r.idempotencyKey) > 36 {
+		return localVarReturnValue, nil, reportError("idempotencyKey must have less than 36 elements")
 	}
 	if r.paymentEvent == nil {
 		return localVarReturnValue, nil, reportError("paymentEvent is required and must be specified")
@@ -122,12 +122,12 @@ func (a *SignalIntelligenceAPIService) IngestPaymentEventExecute(r ApiIngestPaym
 	if localVarHTTPHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
-	if r.xTraceId != nil {
-		parameterAddToHeaderOrQuery(localVarHeaderParams, "x-trace-id", r.xTraceId, "simple", "")
+	if r.traceId != nil {
+		parameterAddToHeaderOrQuery(localVarHeaderParams, "trace-id", r.traceId, "simple", "")
 	}
-	parameterAddToHeaderOrQuery(localVarHeaderParams, "x-idempotency-key", r.xIdempotencyKey, "", "")
-	if r.xAlogramAgentManifest != nil {
-		parameterAddToHeaderOrQuery(localVarHeaderParams, "x-alogram-agent-manifest", r.xAlogramAgentManifest, "", "")
+	parameterAddToHeaderOrQuery(localVarHeaderParams, "idempotency-key", r.idempotencyKey, "", "")
+	if r.alogramAgentManifest != nil {
+		parameterAddToHeaderOrQuery(localVarHeaderParams, "alogram-agent-manifest", r.alogramAgentManifest, "", "")
 	}
 	// body params
 	localVarPostBody = r.paymentEvent
@@ -283,15 +283,15 @@ func (a *SignalIntelligenceAPIService) IngestPaymentEventExecute(r ApiIngestPaym
 type ApiIngestSignalsRequest struct {
 	ctx context.Context
 	ApiService *SignalIntelligenceAPIService
-	xIdempotencyKey *string
+	idempotencyKey *string
 	signalsRequest *SignalsRequest
-	xTraceId *string
-	xAlogramAgentManifest *AgentManifest
+	traceId *string
+	alogramAgentManifest *AgentManifest
 }
 
 // Unique Idempotency-Key sent in the POST request etc.
-func (r ApiIngestSignalsRequest) XIdempotencyKey(xIdempotencyKey string) ApiIngestSignalsRequest {
-	r.xIdempotencyKey = &xIdempotencyKey
+func (r ApiIngestSignalsRequest) IdempotencyKey(idempotencyKey string) ApiIngestSignalsRequest {
+	r.idempotencyKey = &idempotencyKey
 	return r
 }
 
@@ -301,14 +301,14 @@ func (r ApiIngestSignalsRequest) SignalsRequest(signalsRequest SignalsRequest) A
 }
 
 // Echoed or generated trace ID for tracking requests.
-func (r ApiIngestSignalsRequest) XTraceId(xTraceId string) ApiIngestSignalsRequest {
-	r.xTraceId = &xTraceId
+func (r ApiIngestSignalsRequest) TraceId(traceId string) ApiIngestSignalsRequest {
+	r.traceId = &traceId
 	return r
 }
 
 // JSON-encoded AgentManifest for autonomous shopping agents.  Required for machine-to-machine trust validation (UCP/MCP). 
-func (r ApiIngestSignalsRequest) XAlogramAgentManifest(xAlogramAgentManifest AgentManifest) ApiIngestSignalsRequest {
-	r.xAlogramAgentManifest = &xAlogramAgentManifest
+func (r ApiIngestSignalsRequest) AlogramAgentManifest(alogramAgentManifest AgentManifest) ApiIngestSignalsRequest {
+	r.alogramAgentManifest = &alogramAgentManifest
 	return r
 }
 
@@ -349,14 +349,14 @@ func (a *SignalIntelligenceAPIService) IngestSignalsExecute(r ApiIngestSignalsRe
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
-	if r.xIdempotencyKey == nil {
-		return localVarReturnValue, nil, reportError("xIdempotencyKey is required and must be specified")
+	if r.idempotencyKey == nil {
+		return localVarReturnValue, nil, reportError("idempotencyKey is required and must be specified")
 	}
-	if strlen(*r.xIdempotencyKey) < 36 {
-		return localVarReturnValue, nil, reportError("xIdempotencyKey must have at least 36 elements")
+	if strlen(*r.idempotencyKey) < 36 {
+		return localVarReturnValue, nil, reportError("idempotencyKey must have at least 36 elements")
 	}
-	if strlen(*r.xIdempotencyKey) > 36 {
-		return localVarReturnValue, nil, reportError("xIdempotencyKey must have less than 36 elements")
+	if strlen(*r.idempotencyKey) > 36 {
+		return localVarReturnValue, nil, reportError("idempotencyKey must have less than 36 elements")
 	}
 	if r.signalsRequest == nil {
 		return localVarReturnValue, nil, reportError("signalsRequest is required and must be specified")
@@ -379,12 +379,12 @@ func (a *SignalIntelligenceAPIService) IngestSignalsExecute(r ApiIngestSignalsRe
 	if localVarHTTPHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
-	if r.xTraceId != nil {
-		parameterAddToHeaderOrQuery(localVarHeaderParams, "x-trace-id", r.xTraceId, "simple", "")
+	if r.traceId != nil {
+		parameterAddToHeaderOrQuery(localVarHeaderParams, "trace-id", r.traceId, "simple", "")
 	}
-	parameterAddToHeaderOrQuery(localVarHeaderParams, "x-idempotency-key", r.xIdempotencyKey, "", "")
-	if r.xAlogramAgentManifest != nil {
-		parameterAddToHeaderOrQuery(localVarHeaderParams, "x-alogram-agent-manifest", r.xAlogramAgentManifest, "", "")
+	parameterAddToHeaderOrQuery(localVarHeaderParams, "idempotency-key", r.idempotencyKey, "", "")
+	if r.alogramAgentManifest != nil {
+		parameterAddToHeaderOrQuery(localVarHeaderParams, "alogram-agent-manifest", r.alogramAgentManifest, "", "")
 	}
 	// body params
 	localVarPostBody = r.signalsRequest

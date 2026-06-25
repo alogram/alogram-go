@@ -164,14 +164,14 @@ func TestE2E_Simulator(t *testing.T) {
 	if err != nil {
 		t.Fatalf("🔥 Risk check failed: %v", err)
 	}
-	fmt.Printf("✅ Decision: %s | Score: %f\n", decision.Decision, decision.DecisionScore)
+	fmt.Printf("✅ Decision: %s | Score: %f\n", decision.Decision, decision.RiskScore)
 
-	if decision.PaymentIntentId != nil {
+	if decision.Id != "" {
 		// 💳 Step 4: Authorization
 		fmt.Println("💳 Ingesting Authorization...")
 		eventAuth := payrisk_v1.PaymentEvent{
-			PaymentIntentId: *decision.PaymentIntentId,
-			EventType:       "authorization",
+			PaymentIntentId: decision.Id,
+			EventType:       payrisk_v1.PAYMENTEVENTTYPE_AUTHORIZATION,
 			Timestamp:       time.Now().UTC().Format(time.RFC3339),
 			Amount:          payrisk_v1.PtrFloat32(350.00),
 			Currency:        payrisk_v1.PtrString("USD"),
@@ -194,8 +194,8 @@ func TestE2E_Simulator(t *testing.T) {
 		// 💰 Step 5: Capture
 		fmt.Println("💰 Ingesting Capture...")
 		eventCap := payrisk_v1.PaymentEvent{
-			PaymentIntentId: *decision.PaymentIntentId,
-			EventType:       "capture",
+			PaymentIntentId: decision.Id,
+			EventType:       payrisk_v1.PAYMENTEVENTTYPE_CAPTURE,
 			Timestamp:       time.Now().UTC().Format(time.RFC3339),
 			Amount:          payrisk_v1.PtrFloat32(350.00),
 			Currency:        payrisk_v1.PtrString("USD"),
@@ -220,7 +220,7 @@ func TestE2E_Simulator(t *testing.T) {
 		if err == nil {
 			found := false
 			for _, s := range history.Scores {
-				if s.AssessmentId == decision.AssessmentId {
+				if s.Id == decision.Id {
 					found = true
 					break
 				}

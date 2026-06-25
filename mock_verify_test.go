@@ -19,8 +19,8 @@ func TestMockRiskClient(t *testing.T) {
 	// Test Queued
 	mock.QueueDecision("decline", 0.99, "test_reason")
 	resp2, _ := mock.CheckRisk(context.Background(), payrisk_v1.CheckRequest{}, "ik", "tid")
-	if resp2.Decision != "decline" || *resp2.FraudScore.Score != 0.99 {
-		t.Errorf("Expected decline 0.99, got %s %f", resp2.Decision, *resp2.FraudScore.Score)
+	if resp2.Decision != "decline" || resp2.RiskScore != 0.99 {
+		t.Errorf("Expected decline 0.99, got %s %f", resp2.Decision, resp2.RiskScore)
 	}
 
 	// Test Call Count

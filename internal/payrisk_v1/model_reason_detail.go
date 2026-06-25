@@ -3,7 +3,7 @@ Alogram PayRisk Engine
 
 Alogram PayRisk is an AI-native decision engine built for the speed and  complexity of the modern commerce era. In a high-velocity world where  AI-driven threats evolve in milliseconds, Alogram provides the real-time  adaptability and forensic transparency needed to protect your ecosystem  with total confidence. We solve the challenge of balancing frictionless  growth with regulatory explainability, delivering instant, intelligent  risk orchestration at enterprise scale.  ---   ## Licensing & Terms   Our client libraries and API specifications are open-source under the **Apache License 2.0**  to ensure seamless integration into your tech stack.  Use of the Alogram PayRisk API service is proprietary and governed by our  [Terms of Service](https://alogram.ai/#tos) and your specific **Enterprise Agreement**,  if applicable.  To access the service, you must have: *   A valid Alogram API Key. *   An active subscription or signed Master Service Agreement.  Unauthorized use, including automated scraping or reverse engineering of the  scoring engine, is strictly prohibited.   ---   ## Support & Traceability   Every Alogram API response includes a unique **`x-trace-id`** header.  Please include this ID when contacting [packages@alogram.ai](mailto:packages@alogram.ai)  regarding specific transactions or errors.   ---   ## Specification   The authoritative OpenAPI specification for this version is available for download: **[Download openapi.yaml](https://developers.alogram.ai/openapi.yaml)** | **[Download openapi.json](https://developers.alogram.ai/openapi.json)** 
 
-API version: 0.2.24
+API version: 0.3.1
 Contact: packages@alogram.ai
 */
 
@@ -31,6 +31,8 @@ type ReasonDetail struct {
 	Description *string `json:"description,omitempty"`
 	// Suggested action for the merchant to mitigate this specific risk.
 	RecommendedAction *string `json:"recommendedAction,omitempty"`
+	// The structural or mathematical influence of this specific reason on the final decision (e.g., 'critical_trigger', 'suppression_reduction', 'score_increment').
+	Impact *string `json:"impact,omitempty"`
 }
 
 type _ReasonDetail ReasonDetail
@@ -191,6 +193,38 @@ func (o *ReasonDetail) SetRecommendedAction(v string) {
 	o.RecommendedAction = &v
 }
 
+// GetImpact returns the Impact field value if set, zero value otherwise.
+func (o *ReasonDetail) GetImpact() string {
+	if o == nil || IsNil(o.Impact) {
+		var ret string
+		return ret
+	}
+	return *o.Impact
+}
+
+// GetImpactOk returns a tuple with the Impact field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *ReasonDetail) GetImpactOk() (*string, bool) {
+	if o == nil || IsNil(o.Impact) {
+		return nil, false
+	}
+	return o.Impact, true
+}
+
+// HasImpact returns a boolean if a field has been set.
+func (o *ReasonDetail) HasImpact() bool {
+	if o != nil && !IsNil(o.Impact) {
+		return true
+	}
+
+	return false
+}
+
+// SetImpact gets a reference to the given string and assigns it to the Impact field.
+func (o *ReasonDetail) SetImpact(v string) {
+	o.Impact = &v
+}
+
 func (o ReasonDetail) MarshalJSON() ([]byte, error) {
 	toSerialize,err := o.ToMap()
 	if err != nil {
@@ -209,6 +243,9 @@ func (o ReasonDetail) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.RecommendedAction) {
 		toSerialize["recommendedAction"] = o.RecommendedAction
+	}
+	if !IsNil(o.Impact) {
+		toSerialize["impact"] = o.Impact
 	}
 	return toSerialize, nil
 }

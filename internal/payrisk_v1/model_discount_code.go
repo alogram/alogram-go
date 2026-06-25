@@ -3,7 +3,7 @@ Alogram PayRisk Engine
 
 Alogram PayRisk is an AI-native decision engine built for the speed and  complexity of the modern commerce era. In a high-velocity world where  AI-driven threats evolve in milliseconds, Alogram provides the real-time  adaptability and forensic transparency needed to protect your ecosystem  with total confidence. We solve the challenge of balancing frictionless  growth with regulatory explainability, delivering instant, intelligent  risk orchestration at enterprise scale.  ---   ## Licensing & Terms   Our client libraries and API specifications are open-source under the **Apache License 2.0**  to ensure seamless integration into your tech stack.  Use of the Alogram PayRisk API service is proprietary and governed by our  [Terms of Service](https://alogram.ai/#tos) and your specific **Enterprise Agreement**,  if applicable.  To access the service, you must have: *   A valid Alogram API Key. *   An active subscription or signed Master Service Agreement.  Unauthorized use, including automated scraping or reverse engineering of the  scoring engine, is strictly prohibited.   ---   ## Support & Traceability   Every Alogram API response includes a unique **`x-trace-id`** header.  Please include this ID when contacting [packages@alogram.ai](mailto:packages@alogram.ai)  regarding specific transactions or errors.   ---   ## Specification   The authoritative OpenAPI specification for this version is available for download: **[Download openapi.yaml](https://developers.alogram.ai/openapi.yaml)** | **[Download openapi.json](https://developers.alogram.ai/openapi.json)** 
 
-API version: 0.2.24
+API version: 0.3.1
 Contact: packages@alogram.ai
 */
 
@@ -13,8 +13,6 @@ package payrisk_v1
 
 import (
 	"encoding/json"
-	"bytes"
-	"fmt"
 )
 
 // checks if the DiscountCode type satisfies the MappedNullable interface at compile time
@@ -23,7 +21,7 @@ var _ MappedNullable = &DiscountCode{}
 // DiscountCode struct for DiscountCode
 type DiscountCode struct {
 	// The discount code string (e.g., 'SUMMER20').
-	Code string `json:"code"`
+	Code NullableString `json:"code,omitempty"`
 	// The monetary value saved by this discount.
 	Amount *float32 `json:"amount,omitempty"`
 	// The type of discount applied.
@@ -32,15 +30,12 @@ type DiscountCode struct {
 	UsageLimitPerUser *int32 `json:"usageLimitPerUser,omitempty"`
 }
 
-type _DiscountCode DiscountCode
-
 // NewDiscountCode instantiates a new DiscountCode object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewDiscountCode(code string) *DiscountCode {
+func NewDiscountCode() *DiscountCode {
 	this := DiscountCode{}
-	this.Code = code
 	return &this
 }
 
@@ -52,28 +47,46 @@ func NewDiscountCodeWithDefaults() *DiscountCode {
 	return &this
 }
 
-// GetCode returns the Code field value
+// GetCode returns the Code field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *DiscountCode) GetCode() string {
-	if o == nil {
+	if o == nil || IsNil(o.Code.Get()) {
 		var ret string
 		return ret
 	}
-
-	return o.Code
+	return *o.Code.Get()
 }
 
-// GetCodeOk returns a tuple with the Code field value
+// GetCodeOk returns a tuple with the Code field value if set, nil otherwise
 // and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
 func (o *DiscountCode) GetCodeOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
-	return &o.Code, true
+	return o.Code.Get(), o.Code.IsSet()
 }
 
-// SetCode sets field value
+// HasCode returns a boolean if a field has been set.
+func (o *DiscountCode) HasCode() bool {
+	if o != nil && o.Code.IsSet() {
+		return true
+	}
+
+	return false
+}
+
+// SetCode gets a reference to the given NullableString and assigns it to the Code field.
 func (o *DiscountCode) SetCode(v string) {
-	o.Code = v
+	o.Code.Set(&v)
+}
+// SetCodeNil sets the value for Code to be an explicit nil
+func (o *DiscountCode) SetCodeNil() {
+	o.Code.Set(nil)
+}
+
+// UnsetCode ensures that no value is present for Code, not even an explicit nil
+func (o *DiscountCode) UnsetCode() {
+	o.Code.Unset()
 }
 
 // GetAmount returns the Amount field value if set, zero value otherwise.
@@ -182,7 +195,9 @@ func (o DiscountCode) MarshalJSON() ([]byte, error) {
 
 func (o DiscountCode) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	toSerialize["code"] = o.Code
+	if o.Code.IsSet() {
+		toSerialize["code"] = o.Code.Get()
+	}
 	if !IsNil(o.Amount) {
 		toSerialize["amount"] = o.Amount
 	}
@@ -193,43 +208,6 @@ func (o DiscountCode) ToMap() (map[string]interface{}, error) {
 		toSerialize["usageLimitPerUser"] = o.UsageLimitPerUser
 	}
 	return toSerialize, nil
-}
-
-func (o *DiscountCode) UnmarshalJSON(data []byte) (err error) {
-	// This validates that all required properties are included in the JSON object
-	// by unmarshalling the object into a generic map with string keys and checking
-	// that every required field exists as a key in the generic map.
-	requiredProperties := []string{
-		"code",
-	}
-
-	allProperties := make(map[string]interface{})
-
-	err = json.Unmarshal(data, &allProperties)
-
-	if err != nil {
-		return err;
-	}
-
-	for _, requiredProperty := range(requiredProperties) {
-		if _, exists := allProperties[requiredProperty]; !exists {
-			return fmt.Errorf("no value given for required property %v", requiredProperty)
-		}
-	}
-
-	varDiscountCode := _DiscountCode{}
-
-	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
-	err = decoder.Decode(&varDiscountCode)
-
-	if err != nil {
-		return err
-	}
-
-	*o = DiscountCode(varDiscountCode)
-
-	return err
 }
 
 type NullableDiscountCode struct {

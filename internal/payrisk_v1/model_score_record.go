@@ -3,7 +3,7 @@ Alogram PayRisk Engine
 
 Alogram PayRisk is an AI-native decision engine built for the speed and  complexity of the modern commerce era. In a high-velocity world where  AI-driven threats evolve in milliseconds, Alogram provides the real-time  adaptability and forensic transparency needed to protect your ecosystem  with total confidence. We solve the challenge of balancing frictionless  growth with regulatory explainability, delivering instant, intelligent  risk orchestration at enterprise scale.  ---   ## Licensing & Terms   Our client libraries and API specifications are open-source under the **Apache License 2.0**  to ensure seamless integration into your tech stack.  Use of the Alogram PayRisk API service is proprietary and governed by our  [Terms of Service](https://alogram.ai/#tos) and your specific **Enterprise Agreement**,  if applicable.  To access the service, you must have: *   A valid Alogram API Key. *   An active subscription or signed Master Service Agreement.  Unauthorized use, including automated scraping or reverse engineering of the  scoring engine, is strictly prohibited.   ---   ## Support & Traceability   Every Alogram API response includes a unique **`x-trace-id`** header.  Please include this ID when contacting [packages@alogram.ai](mailto:packages@alogram.ai)  regarding specific transactions or errors.   ---   ## Specification   The authoritative OpenAPI specification for this version is available for download: **[Download openapi.yaml](https://developers.alogram.ai/openapi.yaml)** | **[Download openapi.json](https://developers.alogram.ai/openapi.json)** 
 
-API version: 0.2.24
+API version: 0.3.1
 Contact: packages@alogram.ai
 */
 
@@ -22,19 +22,14 @@ var _ MappedNullable = &ScoreRecord{}
 
 // ScoreRecord Fraud score for a specific transaction or entity.
 type ScoreRecord struct {
-	// Universal decision identifier (for purchases, equals paymentIntentId).
-	AssessmentId string `json:"assessmentId"`
-	// Server-minted unique payment identifier.
-	PaymentIntentId *string `json:"paymentIntentId,omitempty" validate:"regexp=^pi_[a-f0-9]{32}$"`
+	// Universal, authoritative transaction and evaluation identifier. Prefixed with 'pi_' for purchases.
+	Id string `json:"id"`
 	// RFC 3339 timestamp with timezone.
 	DecisionAt string `json:"decisionAt" validate:"regexp=^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}(\\\\.\\\\d{1,9})?(Z|[+-]\\\\d{2}:\\\\d{2})$"`
 	// The synchronous risk decision for a purchase.
 	Decision string `json:"decision"`
-	// DEPRECATED: Use decisionScore instead. Fraud risk score (0.00 - 1.00).
+	// The authoritative, policy-adjusted blended risk score (0.0 - 1.0) derived from expert fusion.
 	RiskScore float32 `json:"riskScore"`
-	// The authoritative blended risk score (0.0 - 1.0) derived from expert fusion.
-	DecisionScore float32 `json:"decisionScore"`
-	FraudScore *FraudScore `json:"fraudScore,omitempty"`
 	Breakdown *RiskBreakdown `json:"breakdown,omitempty"`
 	// Structured reason details for the score.
 	Reasons []ReasonDetail `json:"reasons,omitempty"`
@@ -51,13 +46,12 @@ type _ScoreRecord ScoreRecord
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewScoreRecord(assessmentId string, decisionAt string, decision string, riskScore float32, decisionScore float32) *ScoreRecord {
+func NewScoreRecord(id string, decisionAt string, decision string, riskScore float32) *ScoreRecord {
 	this := ScoreRecord{}
-	this.AssessmentId = assessmentId
+	this.Id = id
 	this.DecisionAt = decisionAt
 	this.Decision = decision
 	this.RiskScore = riskScore
-	this.DecisionScore = decisionScore
 	return &this
 }
 
@@ -69,60 +63,28 @@ func NewScoreRecordWithDefaults() *ScoreRecord {
 	return &this
 }
 
-// GetAssessmentId returns the AssessmentId field value
-func (o *ScoreRecord) GetAssessmentId() string {
+// GetId returns the Id field value
+func (o *ScoreRecord) GetId() string {
 	if o == nil {
 		var ret string
 		return ret
 	}
 
-	return o.AssessmentId
+	return o.Id
 }
 
-// GetAssessmentIdOk returns a tuple with the AssessmentId field value
+// GetIdOk returns a tuple with the Id field value
 // and a boolean to check if the value has been set.
-func (o *ScoreRecord) GetAssessmentIdOk() (*string, bool) {
+func (o *ScoreRecord) GetIdOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
-	return &o.AssessmentId, true
+	return &o.Id, true
 }
 
-// SetAssessmentId sets field value
-func (o *ScoreRecord) SetAssessmentId(v string) {
-	o.AssessmentId = v
-}
-
-// GetPaymentIntentId returns the PaymentIntentId field value if set, zero value otherwise.
-func (o *ScoreRecord) GetPaymentIntentId() string {
-	if o == nil || IsNil(o.PaymentIntentId) {
-		var ret string
-		return ret
-	}
-	return *o.PaymentIntentId
-}
-
-// GetPaymentIntentIdOk returns a tuple with the PaymentIntentId field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *ScoreRecord) GetPaymentIntentIdOk() (*string, bool) {
-	if o == nil || IsNil(o.PaymentIntentId) {
-		return nil, false
-	}
-	return o.PaymentIntentId, true
-}
-
-// HasPaymentIntentId returns a boolean if a field has been set.
-func (o *ScoreRecord) HasPaymentIntentId() bool {
-	if o != nil && !IsNil(o.PaymentIntentId) {
-		return true
-	}
-
-	return false
-}
-
-// SetPaymentIntentId gets a reference to the given string and assigns it to the PaymentIntentId field.
-func (o *ScoreRecord) SetPaymentIntentId(v string) {
-	o.PaymentIntentId = &v
+// SetId sets field value
+func (o *ScoreRecord) SetId(v string) {
+	o.Id = v
 }
 
 // GetDecisionAt returns the DecisionAt field value
@@ -195,62 +157,6 @@ func (o *ScoreRecord) GetRiskScoreOk() (*float32, bool) {
 // SetRiskScore sets field value
 func (o *ScoreRecord) SetRiskScore(v float32) {
 	o.RiskScore = v
-}
-
-// GetDecisionScore returns the DecisionScore field value
-func (o *ScoreRecord) GetDecisionScore() float32 {
-	if o == nil {
-		var ret float32
-		return ret
-	}
-
-	return o.DecisionScore
-}
-
-// GetDecisionScoreOk returns a tuple with the DecisionScore field value
-// and a boolean to check if the value has been set.
-func (o *ScoreRecord) GetDecisionScoreOk() (*float32, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.DecisionScore, true
-}
-
-// SetDecisionScore sets field value
-func (o *ScoreRecord) SetDecisionScore(v float32) {
-	o.DecisionScore = v
-}
-
-// GetFraudScore returns the FraudScore field value if set, zero value otherwise.
-func (o *ScoreRecord) GetFraudScore() FraudScore {
-	if o == nil || IsNil(o.FraudScore) {
-		var ret FraudScore
-		return ret
-	}
-	return *o.FraudScore
-}
-
-// GetFraudScoreOk returns a tuple with the FraudScore field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *ScoreRecord) GetFraudScoreOk() (*FraudScore, bool) {
-	if o == nil || IsNil(o.FraudScore) {
-		return nil, false
-	}
-	return o.FraudScore, true
-}
-
-// HasFraudScore returns a boolean if a field has been set.
-func (o *ScoreRecord) HasFraudScore() bool {
-	if o != nil && !IsNil(o.FraudScore) {
-		return true
-	}
-
-	return false
-}
-
-// SetFraudScore gets a reference to the given FraudScore and assigns it to the FraudScore field.
-func (o *ScoreRecord) SetFraudScore(v FraudScore) {
-	o.FraudScore = &v
 }
 
 // GetBreakdown returns the Breakdown field value if set, zero value otherwise.
@@ -423,17 +329,10 @@ func (o ScoreRecord) MarshalJSON() ([]byte, error) {
 
 func (o ScoreRecord) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	toSerialize["assessmentId"] = o.AssessmentId
-	if !IsNil(o.PaymentIntentId) {
-		toSerialize["paymentIntentId"] = o.PaymentIntentId
-	}
+	toSerialize["id"] = o.Id
 	toSerialize["decisionAt"] = o.DecisionAt
 	toSerialize["decision"] = o.Decision
 	toSerialize["riskScore"] = o.RiskScore
-	toSerialize["decisionScore"] = o.DecisionScore
-	if !IsNil(o.FraudScore) {
-		toSerialize["fraudScore"] = o.FraudScore
-	}
 	if !IsNil(o.Breakdown) {
 		toSerialize["breakdown"] = o.Breakdown
 	}
@@ -457,11 +356,10 @@ func (o *ScoreRecord) UnmarshalJSON(data []byte) (err error) {
 	// by unmarshalling the object into a generic map with string keys and checking
 	// that every required field exists as a key in the generic map.
 	requiredProperties := []string{
-		"assessmentId",
+		"id",
 		"decisionAt",
 		"decision",
 		"riskScore",
-		"decisionScore",
 	}
 
 	allProperties := make(map[string]interface{})

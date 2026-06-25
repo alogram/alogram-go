@@ -45,19 +45,14 @@ func (m *MockRiskClient) QueueDecision(decision string, score float32, reason st
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	
-	scoreVal := score
 	id := fmt.Sprintf("mock-%d", time.Now().UnixNano())
 	now := time.Now().Format(time.RFC3339)
 	
 	resp := &payrisk_v1.DecisionResponse{
-		Decision: decision,
+		Id:         id,
+		Decision:   decision,
 		DecisionAt: now,
-		RiskScore: score,
-		FraudScore: &payrisk_v1.FraudScore{
-			Score: &scoreVal,
-			RiskLevel: "low",
-		},
-		AssessmentId: id,
+		RiskScore:  score,
 	}
 	
 	if reason != "" {
@@ -132,18 +127,13 @@ func (m *MockRiskClient) CheckRisk(ctx context.Context, req payrisk_v1.CheckRequ
 
 	id := fmt.Sprintf("mock-%d", time.Now().UnixNano())
 	now := time.Now().Format(time.RFC3339)
-	scoreVal := m.defaultScore
 	msg := "default_mock_response"
 
 	return &payrisk_v1.DecisionResponse{
-		Decision: m.defaultDecision,
+		Id:         id,
+		Decision:   m.defaultDecision,
 		DecisionAt: now,
-		RiskScore: m.defaultScore,
-		FraudScore: &payrisk_v1.FraudScore{
-			Score: &scoreVal,
-			RiskLevel: "low",
-		},
-		AssessmentId: id,
+		RiskScore:  m.defaultScore,
 		Reasons: []payrisk_v1.ReasonDetail{
 			{
 				Code: "DEFAULT",

@@ -3,7 +3,7 @@ Alogram PayRisk Engine
 
 Alogram PayRisk is an AI-native decision engine built for the speed and  complexity of the modern commerce era. In a high-velocity world where  AI-driven threats evolve in milliseconds, Alogram provides the real-time  adaptability and forensic transparency needed to protect your ecosystem  with total confidence. We solve the challenge of balancing frictionless  growth with regulatory explainability, delivering instant, intelligent  risk orchestration at enterprise scale.  ---   ## Licensing & Terms   Our client libraries and API specifications are open-source under the **Apache License 2.0**  to ensure seamless integration into your tech stack.  Use of the Alogram PayRisk API service is proprietary and governed by our  [Terms of Service](https://alogram.ai/#tos) and your specific **Enterprise Agreement**,  if applicable.  To access the service, you must have: *   A valid Alogram API Key. *   An active subscription or signed Master Service Agreement.  Unauthorized use, including automated scraping or reverse engineering of the  scoring engine, is strictly prohibited.   ---   ## Support & Traceability   Every Alogram API response includes a unique **`x-trace-id`** header.  Please include this ID when contacting [packages@alogram.ai](mailto:packages@alogram.ai)  regarding specific transactions or errors.   ---   ## Specification   The authoritative OpenAPI specification for this version is available for download: **[Download openapi.yaml](https://developers.alogram.ai/openapi.yaml)** | **[Download openapi.json](https://developers.alogram.ai/openapi.json)** 
 
-API version: 0.2.24
+API version: 0.3.1
 Contact: packages@alogram.ai
 */
 
@@ -22,30 +22,18 @@ var _ MappedNullable = &DecisionResponse{}
 
 // DecisionResponse The synchronous risk decision for a purchase.
 type DecisionResponse struct {
-	// Universal decision identifier. For purchases, equals paymentIntentId.
-	AssessmentId string `json:"assessmentId" validate:"regexp=^[a-zA-Z0-9\\\\-_]+$"`
+	// Alogram's unique, authoritative evaluation and transaction identifier. Prefixed with 'pi_' for purchases.
+	Id string `json:"id"`
+	// The authoritative, absolute policy command for this transaction. Downstream systems must bind their operational behavior (approve/decline/review) directly to this field.
 	Decision string `json:"decision"`
 	// RFC 3339 timestamp with timezone.
 	DecisionAt string `json:"decisionAt" validate:"regexp=^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}:\\\\d{2}(\\\\.\\\\d{1,9})?(Z|[+-]\\\\d{2}:\\\\d{2})$"`
-	// DEPRECATED: Use decisionScore instead. Current blended risk score.
+	// The authoritative, policy-adjusted blended risk score (0.0 - 1.0) derived from expert fusion.
 	RiskScore float32 `json:"riskScore"`
-	// The authoritative blended risk score (0.0 - 1.0) derived from expert fusion.
-	DecisionScore float32 `json:"decisionScore"`
-	FraudScore *FraudScore `json:"fraudScore,omitempty"`
-	Breakdown *RiskBreakdown `json:"breakdown,omitempty"`
-	// Technical reason codes for the decision.
-	ReasonCodes []string `json:"reasonCodes,omitempty"`
 	// Structured reason details for the decision.
 	Reasons []ReasonDetail `json:"reasons,omitempty"`
-	Actions []string `json:"actions,omitempty"`
-	// Server-minted unique payment identifier.
-	PaymentIntentId *string `json:"paymentIntentId,omitempty" validate:"regexp=^pi_[a-f0-9]{32}$"`
-	// The version of the policy that generated the decision.
-	PolicyVersion *string `json:"policyVersion,omitempty"`
-	// The version of the model that generated the decision.
-	ModelVersion *string `json:"modelVersion,omitempty"`
-	// Time to live for the decision in seconds.
-	TtlSeconds *int32 `json:"ttlSeconds,omitempty"`
+	Breakdown *RiskBreakdown `json:"breakdown,omitempty"`
+	Policy *DecisionResponsePolicy `json:"policy,omitempty"`
 }
 
 type _DecisionResponse DecisionResponse
@@ -54,13 +42,12 @@ type _DecisionResponse DecisionResponse
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewDecisionResponse(assessmentId string, decision string, decisionAt string, riskScore float32, decisionScore float32) *DecisionResponse {
+func NewDecisionResponse(id string, decision string, decisionAt string, riskScore float32) *DecisionResponse {
 	this := DecisionResponse{}
-	this.AssessmentId = assessmentId
+	this.Id = id
 	this.Decision = decision
 	this.DecisionAt = decisionAt
 	this.RiskScore = riskScore
-	this.DecisionScore = decisionScore
 	return &this
 }
 
@@ -72,28 +59,28 @@ func NewDecisionResponseWithDefaults() *DecisionResponse {
 	return &this
 }
 
-// GetAssessmentId returns the AssessmentId field value
-func (o *DecisionResponse) GetAssessmentId() string {
+// GetId returns the Id field value
+func (o *DecisionResponse) GetId() string {
 	if o == nil {
 		var ret string
 		return ret
 	}
 
-	return o.AssessmentId
+	return o.Id
 }
 
-// GetAssessmentIdOk returns a tuple with the AssessmentId field value
+// GetIdOk returns a tuple with the Id field value
 // and a boolean to check if the value has been set.
-func (o *DecisionResponse) GetAssessmentIdOk() (*string, bool) {
+func (o *DecisionResponse) GetIdOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
-	return &o.AssessmentId, true
+	return &o.Id, true
 }
 
-// SetAssessmentId sets field value
-func (o *DecisionResponse) SetAssessmentId(v string) {
-	o.AssessmentId = v
+// SetId sets field value
+func (o *DecisionResponse) SetId(v string) {
+	o.Id = v
 }
 
 // GetDecision returns the Decision field value
@@ -168,60 +155,36 @@ func (o *DecisionResponse) SetRiskScore(v float32) {
 	o.RiskScore = v
 }
 
-// GetDecisionScore returns the DecisionScore field value
-func (o *DecisionResponse) GetDecisionScore() float32 {
-	if o == nil {
-		var ret float32
+// GetReasons returns the Reasons field value if set, zero value otherwise.
+func (o *DecisionResponse) GetReasons() []ReasonDetail {
+	if o == nil || IsNil(o.Reasons) {
+		var ret []ReasonDetail
 		return ret
 	}
-
-	return o.DecisionScore
+	return o.Reasons
 }
 
-// GetDecisionScoreOk returns a tuple with the DecisionScore field value
+// GetReasonsOk returns a tuple with the Reasons field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *DecisionResponse) GetDecisionScoreOk() (*float32, bool) {
-	if o == nil {
+func (o *DecisionResponse) GetReasonsOk() ([]ReasonDetail, bool) {
+	if o == nil || IsNil(o.Reasons) {
 		return nil, false
 	}
-	return &o.DecisionScore, true
+	return o.Reasons, true
 }
 
-// SetDecisionScore sets field value
-func (o *DecisionResponse) SetDecisionScore(v float32) {
-	o.DecisionScore = v
-}
-
-// GetFraudScore returns the FraudScore field value if set, zero value otherwise.
-func (o *DecisionResponse) GetFraudScore() FraudScore {
-	if o == nil || IsNil(o.FraudScore) {
-		var ret FraudScore
-		return ret
-	}
-	return *o.FraudScore
-}
-
-// GetFraudScoreOk returns a tuple with the FraudScore field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *DecisionResponse) GetFraudScoreOk() (*FraudScore, bool) {
-	if o == nil || IsNil(o.FraudScore) {
-		return nil, false
-	}
-	return o.FraudScore, true
-}
-
-// HasFraudScore returns a boolean if a field has been set.
-func (o *DecisionResponse) HasFraudScore() bool {
-	if o != nil && !IsNil(o.FraudScore) {
+// HasReasons returns a boolean if a field has been set.
+func (o *DecisionResponse) HasReasons() bool {
+	if o != nil && !IsNil(o.Reasons) {
 		return true
 	}
 
 	return false
 }
 
-// SetFraudScore gets a reference to the given FraudScore and assigns it to the FraudScore field.
-func (o *DecisionResponse) SetFraudScore(v FraudScore) {
-	o.FraudScore = &v
+// SetReasons gets a reference to the given []ReasonDetail and assigns it to the Reasons field.
+func (o *DecisionResponse) SetReasons(v []ReasonDetail) {
+	o.Reasons = v
 }
 
 // GetBreakdown returns the Breakdown field value if set, zero value otherwise.
@@ -256,228 +219,36 @@ func (o *DecisionResponse) SetBreakdown(v RiskBreakdown) {
 	o.Breakdown = &v
 }
 
-// GetReasonCodes returns the ReasonCodes field value if set, zero value otherwise.
-func (o *DecisionResponse) GetReasonCodes() []string {
-	if o == nil || IsNil(o.ReasonCodes) {
-		var ret []string
+// GetPolicy returns the Policy field value if set, zero value otherwise.
+func (o *DecisionResponse) GetPolicy() DecisionResponsePolicy {
+	if o == nil || IsNil(o.Policy) {
+		var ret DecisionResponsePolicy
 		return ret
 	}
-	return o.ReasonCodes
+	return *o.Policy
 }
 
-// GetReasonCodesOk returns a tuple with the ReasonCodes field value if set, nil otherwise
+// GetPolicyOk returns a tuple with the Policy field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *DecisionResponse) GetReasonCodesOk() ([]string, bool) {
-	if o == nil || IsNil(o.ReasonCodes) {
+func (o *DecisionResponse) GetPolicyOk() (*DecisionResponsePolicy, bool) {
+	if o == nil || IsNil(o.Policy) {
 		return nil, false
 	}
-	return o.ReasonCodes, true
+	return o.Policy, true
 }
 
-// HasReasonCodes returns a boolean if a field has been set.
-func (o *DecisionResponse) HasReasonCodes() bool {
-	if o != nil && !IsNil(o.ReasonCodes) {
+// HasPolicy returns a boolean if a field has been set.
+func (o *DecisionResponse) HasPolicy() bool {
+	if o != nil && !IsNil(o.Policy) {
 		return true
 	}
 
 	return false
 }
 
-// SetReasonCodes gets a reference to the given []string and assigns it to the ReasonCodes field.
-func (o *DecisionResponse) SetReasonCodes(v []string) {
-	o.ReasonCodes = v
-}
-
-// GetReasons returns the Reasons field value if set, zero value otherwise.
-func (o *DecisionResponse) GetReasons() []ReasonDetail {
-	if o == nil || IsNil(o.Reasons) {
-		var ret []ReasonDetail
-		return ret
-	}
-	return o.Reasons
-}
-
-// GetReasonsOk returns a tuple with the Reasons field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *DecisionResponse) GetReasonsOk() ([]ReasonDetail, bool) {
-	if o == nil || IsNil(o.Reasons) {
-		return nil, false
-	}
-	return o.Reasons, true
-}
-
-// HasReasons returns a boolean if a field has been set.
-func (o *DecisionResponse) HasReasons() bool {
-	if o != nil && !IsNil(o.Reasons) {
-		return true
-	}
-
-	return false
-}
-
-// SetReasons gets a reference to the given []ReasonDetail and assigns it to the Reasons field.
-func (o *DecisionResponse) SetReasons(v []ReasonDetail) {
-	o.Reasons = v
-}
-
-// GetActions returns the Actions field value if set, zero value otherwise.
-func (o *DecisionResponse) GetActions() []string {
-	if o == nil || IsNil(o.Actions) {
-		var ret []string
-		return ret
-	}
-	return o.Actions
-}
-
-// GetActionsOk returns a tuple with the Actions field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *DecisionResponse) GetActionsOk() ([]string, bool) {
-	if o == nil || IsNil(o.Actions) {
-		return nil, false
-	}
-	return o.Actions, true
-}
-
-// HasActions returns a boolean if a field has been set.
-func (o *DecisionResponse) HasActions() bool {
-	if o != nil && !IsNil(o.Actions) {
-		return true
-	}
-
-	return false
-}
-
-// SetActions gets a reference to the given []string and assigns it to the Actions field.
-func (o *DecisionResponse) SetActions(v []string) {
-	o.Actions = v
-}
-
-// GetPaymentIntentId returns the PaymentIntentId field value if set, zero value otherwise.
-func (o *DecisionResponse) GetPaymentIntentId() string {
-	if o == nil || IsNil(o.PaymentIntentId) {
-		var ret string
-		return ret
-	}
-	return *o.PaymentIntentId
-}
-
-// GetPaymentIntentIdOk returns a tuple with the PaymentIntentId field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *DecisionResponse) GetPaymentIntentIdOk() (*string, bool) {
-	if o == nil || IsNil(o.PaymentIntentId) {
-		return nil, false
-	}
-	return o.PaymentIntentId, true
-}
-
-// HasPaymentIntentId returns a boolean if a field has been set.
-func (o *DecisionResponse) HasPaymentIntentId() bool {
-	if o != nil && !IsNil(o.PaymentIntentId) {
-		return true
-	}
-
-	return false
-}
-
-// SetPaymentIntentId gets a reference to the given string and assigns it to the PaymentIntentId field.
-func (o *DecisionResponse) SetPaymentIntentId(v string) {
-	o.PaymentIntentId = &v
-}
-
-// GetPolicyVersion returns the PolicyVersion field value if set, zero value otherwise.
-func (o *DecisionResponse) GetPolicyVersion() string {
-	if o == nil || IsNil(o.PolicyVersion) {
-		var ret string
-		return ret
-	}
-	return *o.PolicyVersion
-}
-
-// GetPolicyVersionOk returns a tuple with the PolicyVersion field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *DecisionResponse) GetPolicyVersionOk() (*string, bool) {
-	if o == nil || IsNil(o.PolicyVersion) {
-		return nil, false
-	}
-	return o.PolicyVersion, true
-}
-
-// HasPolicyVersion returns a boolean if a field has been set.
-func (o *DecisionResponse) HasPolicyVersion() bool {
-	if o != nil && !IsNil(o.PolicyVersion) {
-		return true
-	}
-
-	return false
-}
-
-// SetPolicyVersion gets a reference to the given string and assigns it to the PolicyVersion field.
-func (o *DecisionResponse) SetPolicyVersion(v string) {
-	o.PolicyVersion = &v
-}
-
-// GetModelVersion returns the ModelVersion field value if set, zero value otherwise.
-func (o *DecisionResponse) GetModelVersion() string {
-	if o == nil || IsNil(o.ModelVersion) {
-		var ret string
-		return ret
-	}
-	return *o.ModelVersion
-}
-
-// GetModelVersionOk returns a tuple with the ModelVersion field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *DecisionResponse) GetModelVersionOk() (*string, bool) {
-	if o == nil || IsNil(o.ModelVersion) {
-		return nil, false
-	}
-	return o.ModelVersion, true
-}
-
-// HasModelVersion returns a boolean if a field has been set.
-func (o *DecisionResponse) HasModelVersion() bool {
-	if o != nil && !IsNil(o.ModelVersion) {
-		return true
-	}
-
-	return false
-}
-
-// SetModelVersion gets a reference to the given string and assigns it to the ModelVersion field.
-func (o *DecisionResponse) SetModelVersion(v string) {
-	o.ModelVersion = &v
-}
-
-// GetTtlSeconds returns the TtlSeconds field value if set, zero value otherwise.
-func (o *DecisionResponse) GetTtlSeconds() int32 {
-	if o == nil || IsNil(o.TtlSeconds) {
-		var ret int32
-		return ret
-	}
-	return *o.TtlSeconds
-}
-
-// GetTtlSecondsOk returns a tuple with the TtlSeconds field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *DecisionResponse) GetTtlSecondsOk() (*int32, bool) {
-	if o == nil || IsNil(o.TtlSeconds) {
-		return nil, false
-	}
-	return o.TtlSeconds, true
-}
-
-// HasTtlSeconds returns a boolean if a field has been set.
-func (o *DecisionResponse) HasTtlSeconds() bool {
-	if o != nil && !IsNil(o.TtlSeconds) {
-		return true
-	}
-
-	return false
-}
-
-// SetTtlSeconds gets a reference to the given int32 and assigns it to the TtlSeconds field.
-func (o *DecisionResponse) SetTtlSeconds(v int32) {
-	o.TtlSeconds = &v
+// SetPolicy gets a reference to the given DecisionResponsePolicy and assigns it to the Policy field.
+func (o *DecisionResponse) SetPolicy(v DecisionResponsePolicy) {
+	o.Policy = &v
 }
 
 func (o DecisionResponse) MarshalJSON() ([]byte, error) {
@@ -490,37 +261,18 @@ func (o DecisionResponse) MarshalJSON() ([]byte, error) {
 
 func (o DecisionResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	toSerialize["assessmentId"] = o.AssessmentId
+	toSerialize["id"] = o.Id
 	toSerialize["decision"] = o.Decision
 	toSerialize["decisionAt"] = o.DecisionAt
 	toSerialize["riskScore"] = o.RiskScore
-	toSerialize["decisionScore"] = o.DecisionScore
-	if !IsNil(o.FraudScore) {
-		toSerialize["fraudScore"] = o.FraudScore
+	if !IsNil(o.Reasons) {
+		toSerialize["reasons"] = o.Reasons
 	}
 	if !IsNil(o.Breakdown) {
 		toSerialize["breakdown"] = o.Breakdown
 	}
-	if !IsNil(o.ReasonCodes) {
-		toSerialize["reasonCodes"] = o.ReasonCodes
-	}
-	if !IsNil(o.Reasons) {
-		toSerialize["reasons"] = o.Reasons
-	}
-	if !IsNil(o.Actions) {
-		toSerialize["actions"] = o.Actions
-	}
-	if !IsNil(o.PaymentIntentId) {
-		toSerialize["paymentIntentId"] = o.PaymentIntentId
-	}
-	if !IsNil(o.PolicyVersion) {
-		toSerialize["policyVersion"] = o.PolicyVersion
-	}
-	if !IsNil(o.ModelVersion) {
-		toSerialize["modelVersion"] = o.ModelVersion
-	}
-	if !IsNil(o.TtlSeconds) {
-		toSerialize["ttlSeconds"] = o.TtlSeconds
+	if !IsNil(o.Policy) {
+		toSerialize["policy"] = o.Policy
 	}
 	return toSerialize, nil
 }
@@ -530,11 +282,10 @@ func (o *DecisionResponse) UnmarshalJSON(data []byte) (err error) {
 	// by unmarshalling the object into a generic map with string keys and checking
 	// that every required field exists as a key in the generic map.
 	requiredProperties := []string{
-		"assessmentId",
+		"id",
 		"decision",
 		"decisionAt",
 		"riskScore",
-		"decisionScore",
 	}
 
 	allProperties := make(map[string]interface{})

@@ -1,9 +1,9 @@
 {
   "sdk": "go",
-  "version": "0.3.1",
-  "monorepo_commit": "2bd43e2fb1e0968b6364bb8f6cb97c5f7b92673f",
+  "version": "0.3.2",
+  "monorepo_commit": "78e027e0e0549ea0b7c80cccf6987173da012fb6",
   "openapi_path": "apis/payrisk-v1/openapi.yaml",
-  "openapi_commit": "2bd43e2fb1e0968b6364bb8f6cb97c5f7b92673f",
+  "openapi_commit": "78e027e0e0549ea0b7c80cccf6987173da012fb6",
   "generator": "openapi-generator-cli@7.19.0",
-  "built_at": "2026-06-25T03:16:27Z"
+  "built_at": "2026-06-26T01:48:46Z"
 }

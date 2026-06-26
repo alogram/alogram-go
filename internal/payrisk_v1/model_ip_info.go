@@ -3,7 +3,7 @@ Alogram PayRisk Engine
 
 Alogram PayRisk is an AI-native decision engine built for the speed and  complexity of the modern commerce era. In a high-velocity world where  AI-driven threats evolve in milliseconds, Alogram provides the real-time  adaptability and forensic transparency needed to protect your ecosystem  with total confidence. We solve the challenge of balancing frictionless  growth with regulatory explainability, delivering instant, intelligent  risk orchestration at enterprise scale.  ---   ## Licensing & Terms   Our client libraries and API specifications are open-source under the **Apache License 2.0**  to ensure seamless integration into your tech stack.  Use of the Alogram PayRisk API service is proprietary and governed by our  [Terms of Service](https://alogram.ai/#tos) and your specific **Enterprise Agreement**,  if applicable.  To access the service, you must have: *   A valid Alogram API Key. *   An active subscription or signed Master Service Agreement.  Unauthorized use, including automated scraping or reverse engineering of the  scoring engine, is strictly prohibited.   ---   ## Support & Traceability   Every Alogram API response includes a unique **`x-trace-id`** header.  Please include this ID when contacting [packages@alogram.ai](mailto:packages@alogram.ai)  regarding specific transactions or errors.   ---   ## Specification   The authoritative OpenAPI specification for this version is available for download: **[Download openapi.yaml](https://developers.alogram.ai/openapi.yaml)** | **[Download openapi.json](https://developers.alogram.ai/openapi.json)** 
 
-API version: 0.3.1
+API version: 0.3.2
 Contact: packages@alogram.ai
 */
 
@@ -21,7 +21,7 @@ var _ MappedNullable = &IpInfo{}
 // IpInfo struct for IpInfo
 type IpInfo struct {
 	// IP address of the customer, client, or user that initiated the request. Each octet must be between 0 and 255. 
-	IpAddress *string `json:"ipAddress,omitempty" validate:"regexp=^(\\\\d{1,3}\\\\.){3}\\\\d{1,3}$"`
+	IpAddress *string `json:"ipAddress,omitempty"`
 	// IPv6 address.
 	Ipv6 *string `json:"ipv6,omitempty"`
 	// IP protocol version.
@@ -34,8 +34,8 @@ type IpInfo struct {
 	Org *string `json:"org,omitempty"`
 	// Company associated with the IP address.
 	Company *string `json:"company,omitempty"`
-	// ISO 3166-1 alpha-2 country code.
-	Country *string `json:"country,omitempty" validate:"regexp=^[A-Z]{2}$"`
+	// ISO 3166-1 alpha-2 country code or full country name.
+	Country *string `json:"country,omitempty"`
 	// Region associated with the IP address.
 	Region *string `json:"region,omitempty"`
 	// City associated with the IP address.

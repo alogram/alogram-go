@@ -16,56 +16,64 @@ import (
 	"fmt"
 )
 
-// ChannelEnum pos: 'Point of Sale', ecom: 'E-commerce', in_app: 'In-App Purchase', ivr: 'Interactive Voice Response'. 
-type ChannelEnum string
+// ItemCategoryEnum Standardized high-level commodity classification for fraud scoring.
+type ItemCategoryEnum string
 
-// List of ChannelEnum
+// List of ItemCategoryEnum
 const (
-	CHANNELENUM_POS ChannelEnum = "pos"
-	CHANNELENUM_ECOM ChannelEnum = "ecom"
-	CHANNELENUM_IN_APP ChannelEnum = "in_app"
-	CHANNELENUM_IVR ChannelEnum = "ivr"
+	ITEMCATEGORYENUM_PHYSICAL ItemCategoryEnum = "physical"
+	ITEMCATEGORYENUM_DIGITAL_CONTENT ItemCategoryEnum = "digital_content"
+	ITEMCATEGORYENUM_GIFT_CARD ItemCategoryEnum = "gift_card"
+	ITEMCATEGORYENUM_SUBSCRIPTION ItemCategoryEnum = "subscription"
+	ITEMCATEGORYENUM_SERVICE ItemCategoryEnum = "service"
+	ITEMCATEGORYENUM_TRAVEL ItemCategoryEnum = "travel"
+	ITEMCATEGORYENUM_CRYPTO_VOUCHER ItemCategoryEnum = "crypto_voucher"
+	ITEMCATEGORYENUM_OTHER ItemCategoryEnum = "other"
 )
 
-// All allowed values of ChannelEnum enum
-var AllowedChannelEnumEnumValues = []ChannelEnum{
-	"pos",
-	"ecom",
-	"in_app",
-	"ivr",
+// All allowed values of ItemCategoryEnum enum
+var AllowedItemCategoryEnumEnumValues = []ItemCategoryEnum{
+	"physical",
+	"digital_content",
+	"gift_card",
+	"subscription",
+	"service",
+	"travel",
+	"crypto_voucher",
+	"other",
 }
 
-func (v *ChannelEnum) UnmarshalJSON(src []byte) error {
+func (v *ItemCategoryEnum) UnmarshalJSON(src []byte) error {
 	var value string
 	err := json.Unmarshal(src, &value)
 	if err != nil {
 		return err
 	}
-	enumTypeValue := ChannelEnum(value)
-	for _, existing := range AllowedChannelEnumEnumValues {
+	enumTypeValue := ItemCategoryEnum(value)
+	for _, existing := range AllowedItemCategoryEnumEnumValues {
 		if existing == enumTypeValue {
 			*v = enumTypeValue
 			return nil
 		}
 	}
 
-	return fmt.Errorf("%+v is not a valid ChannelEnum", value)
+	return fmt.Errorf("%+v is not a valid ItemCategoryEnum", value)
 }
 
-// NewChannelEnumFromValue returns a pointer to a valid ChannelEnum
+// NewItemCategoryEnumFromValue returns a pointer to a valid ItemCategoryEnum
 // for the value passed as argument, or an error if the value passed is not allowed by the enum
-func NewChannelEnumFromValue(v string) (*ChannelEnum, error) {
-	ev := ChannelEnum(v)
+func NewItemCategoryEnumFromValue(v string) (*ItemCategoryEnum, error) {
+	ev := ItemCategoryEnum(v)
 	if ev.IsValid() {
 		return &ev, nil
 	} else {
-		return nil, fmt.Errorf("invalid value '%v' for ChannelEnum: valid values are %v", v, AllowedChannelEnumEnumValues)
+		return nil, fmt.Errorf("invalid value '%v' for ItemCategoryEnum: valid values are %v", v, AllowedItemCategoryEnumEnumValues)
 	}
 }
 
 // IsValid return true if the value is valid for the enum, false otherwise
-func (v ChannelEnum) IsValid() bool {
-	for _, existing := range AllowedChannelEnumEnumValues {
+func (v ItemCategoryEnum) IsValid() bool {
+	for _, existing := range AllowedItemCategoryEnumEnumValues {
 		if existing == v {
 			return true
 		}
@@ -73,43 +81,43 @@ func (v ChannelEnum) IsValid() bool {
 	return false
 }
 
-// Ptr returns reference to ChannelEnum value
-func (v ChannelEnum) Ptr() *ChannelEnum {
+// Ptr returns reference to ItemCategoryEnum value
+func (v ItemCategoryEnum) Ptr() *ItemCategoryEnum {
 	return &v
 }
 
-type NullableChannelEnum struct {
-	value *ChannelEnum
+type NullableItemCategoryEnum struct {
+	value *ItemCategoryEnum
 	isSet bool
 }
 
-func (v NullableChannelEnum) Get() *ChannelEnum {
+func (v NullableItemCategoryEnum) Get() *ItemCategoryEnum {
 	return v.value
 }
 
-func (v *NullableChannelEnum) Set(val *ChannelEnum) {
+func (v *NullableItemCategoryEnum) Set(val *ItemCategoryEnum) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableChannelEnum) IsSet() bool {
+func (v NullableItemCategoryEnum) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableChannelEnum) Unset() {
+func (v *NullableItemCategoryEnum) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableChannelEnum(val *ChannelEnum) *NullableChannelEnum {
-	return &NullableChannelEnum{value: val, isSet: true}
+func NewNullableItemCategoryEnum(val *ItemCategoryEnum) *NullableItemCategoryEnum {
+	return &NullableItemCategoryEnum{value: val, isSet: true}
 }
 
-func (v NullableChannelEnum) MarshalJSON() ([]byte, error) {
+func (v NullableItemCategoryEnum) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableChannelEnum) UnmarshalJSON(src []byte) error {
+func (v *NullableItemCategoryEnum) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }

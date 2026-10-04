@@ -16,56 +16,60 @@ import (
 	"fmt"
 )
 
-// ChannelEnum pos: 'Point of Sale', ecom: 'E-commerce', in_app: 'In-App Purchase', ivr: 'Interactive Voice Response'. 
-type ChannelEnum string
+// FulfillmentSpeedEnum Expected speed and channel of fulfillment.
+type FulfillmentSpeedEnum string
 
-// List of ChannelEnum
+// List of FulfillmentSpeedEnum
 const (
-	CHANNELENUM_POS ChannelEnum = "pos"
-	CHANNELENUM_ECOM ChannelEnum = "ecom"
-	CHANNELENUM_IN_APP ChannelEnum = "in_app"
-	CHANNELENUM_IVR ChannelEnum = "ivr"
+	FULFILLMENTSPEEDENUM_STANDARD FulfillmentSpeedEnum = "standard"
+	FULFILLMENTSPEEDENUM_EXPRESS FulfillmentSpeedEnum = "express"
+	FULFILLMENTSPEEDENUM_OVERNIGHT FulfillmentSpeedEnum = "overnight"
+	FULFILLMENTSPEEDENUM_SAME_DAY FulfillmentSpeedEnum = "same_day"
+	FULFILLMENTSPEEDENUM_INSTANT_DIGITAL FulfillmentSpeedEnum = "instant_digital"
+	FULFILLMENTSPEEDENUM_BOPIS FulfillmentSpeedEnum = "bopis"
 )
 
-// All allowed values of ChannelEnum enum
-var AllowedChannelEnumEnumValues = []ChannelEnum{
-	"pos",
-	"ecom",
-	"in_app",
-	"ivr",
+// All allowed values of FulfillmentSpeedEnum enum
+var AllowedFulfillmentSpeedEnumEnumValues = []FulfillmentSpeedEnum{
+	"standard",
+	"express",
+	"overnight",
+	"same_day",
+	"instant_digital",
+	"bopis",
 }
 
-func (v *ChannelEnum) UnmarshalJSON(src []byte) error {
+func (v *FulfillmentSpeedEnum) UnmarshalJSON(src []byte) error {
 	var value string
 	err := json.Unmarshal(src, &value)
 	if err != nil {
 		return err
 	}
-	enumTypeValue := ChannelEnum(value)
-	for _, existing := range AllowedChannelEnumEnumValues {
+	enumTypeValue := FulfillmentSpeedEnum(value)
+	for _, existing := range AllowedFulfillmentSpeedEnumEnumValues {
 		if existing == enumTypeValue {
 			*v = enumTypeValue
 			return nil
 		}
 	}
 
-	return fmt.Errorf("%+v is not a valid ChannelEnum", value)
+	return fmt.Errorf("%+v is not a valid FulfillmentSpeedEnum", value)
 }
 
-// NewChannelEnumFromValue returns a pointer to a valid ChannelEnum
+// NewFulfillmentSpeedEnumFromValue returns a pointer to a valid FulfillmentSpeedEnum
 // for the value passed as argument, or an error if the value passed is not allowed by the enum
-func NewChannelEnumFromValue(v string) (*ChannelEnum, error) {
-	ev := ChannelEnum(v)
+func NewFulfillmentSpeedEnumFromValue(v string) (*FulfillmentSpeedEnum, error) {
+	ev := FulfillmentSpeedEnum(v)
 	if ev.IsValid() {
 		return &ev, nil
 	} else {
-		return nil, fmt.Errorf("invalid value '%v' for ChannelEnum: valid values are %v", v, AllowedChannelEnumEnumValues)
+		return nil, fmt.Errorf("invalid value '%v' for FulfillmentSpeedEnum: valid values are %v", v, AllowedFulfillmentSpeedEnumEnumValues)
 	}
 }
 
 // IsValid return true if the value is valid for the enum, false otherwise
-func (v ChannelEnum) IsValid() bool {
-	for _, existing := range AllowedChannelEnumEnumValues {
+func (v FulfillmentSpeedEnum) IsValid() bool {
+	for _, existing := range AllowedFulfillmentSpeedEnumEnumValues {
 		if existing == v {
 			return true
 		}
@@ -73,43 +77,43 @@ func (v ChannelEnum) IsValid() bool {
 	return false
 }
 
-// Ptr returns reference to ChannelEnum value
-func (v ChannelEnum) Ptr() *ChannelEnum {
+// Ptr returns reference to FulfillmentSpeedEnum value
+func (v FulfillmentSpeedEnum) Ptr() *FulfillmentSpeedEnum {
 	return &v
 }
 
-type NullableChannelEnum struct {
-	value *ChannelEnum
+type NullableFulfillmentSpeedEnum struct {
+	value *FulfillmentSpeedEnum
 	isSet bool
 }
 
-func (v NullableChannelEnum) Get() *ChannelEnum {
+func (v NullableFulfillmentSpeedEnum) Get() *FulfillmentSpeedEnum {
 	return v.value
 }
 
-func (v *NullableChannelEnum) Set(val *ChannelEnum) {
+func (v *NullableFulfillmentSpeedEnum) Set(val *FulfillmentSpeedEnum) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableChannelEnum) IsSet() bool {
+func (v NullableFulfillmentSpeedEnum) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableChannelEnum) Unset() {
+func (v *NullableFulfillmentSpeedEnum) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableChannelEnum(val *ChannelEnum) *NullableChannelEnum {
-	return &NullableChannelEnum{value: val, isSet: true}
+func NewNullableFulfillmentSpeedEnum(val *FulfillmentSpeedEnum) *NullableFulfillmentSpeedEnum {
+	return &NullableFulfillmentSpeedEnum{value: val, isSet: true}
 }
 
-func (v NullableChannelEnum) MarshalJSON() ([]byte, error) {
+func (v NullableFulfillmentSpeedEnum) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableChannelEnum) UnmarshalJSON(src []byte) error {
+func (v *NullableFulfillmentSpeedEnum) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }

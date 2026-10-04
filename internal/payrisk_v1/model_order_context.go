@@ -3,7 +3,7 @@ Alogram PayRisk Engine
 
 Alogram PayRisk is an AI-native decision engine built for the speed and  complexity of the modern commerce era. In a high-velocity world where  AI-driven threats evolve in milliseconds, Alogram provides the real-time  adaptability and forensic transparency needed to protect your ecosystem  with total confidence. We solve the challenge of balancing frictionless  growth with regulatory explainability, delivering instant, intelligent  risk orchestration at enterprise scale.  ---   ## Licensing & Terms   Our client libraries and API specifications are open-source under the **Apache License 2.0**  to ensure seamless integration into your tech stack.  Use of the Alogram PayRisk API service is proprietary and governed by our  [Terms of Service](https://alogram.ai/#tos) and your specific **Enterprise Agreement**,  if applicable.  To access the service, you must have: *   A valid Alogram API Key. *   An active subscription or signed Master Service Agreement.  Unauthorized use, including automated scraping or reverse engineering of the  scoring engine, is strictly prohibited.   ---   ## Support & Traceability   Every Alogram API response includes a unique **`x-trace-id`** header.  Please include this ID when contacting [packages@alogram.ai](mailto:packages@alogram.ai)  regarding specific transactions or errors.   ---   ## Specification   The authoritative OpenAPI specification for this version is available for download: **[Download openapi.yaml](https://developers.alogram.ai/openapi.yaml)** | **[Download openapi.json](https://developers.alogram.ai/openapi.json)** 
 
-API version: 0.3.3
+API version: 0.3.4
 Contact: packages@alogram.ai
 */
 
@@ -18,16 +18,27 @@ import (
 // checks if the OrderContext type satisfies the MappedNullable interface at compile time
 var _ MappedNullable = &OrderContext{}
 
-// OrderContext Order context for the purchase.
+// OrderContext Comprehensive commercial order context for the purchase.
 type OrderContext struct {
-	// Unique identifier for the order.
-	OrderId *string `json:"orderId,omitempty"`
-	// Value of the purchase in the specified currency. Must be a positive number with up to two decimal places. 
+	// Unique identifier for the order or cart in the source storefront. Supports standard alphanumeric IDs (ORD-...), Fortress identifiers, or storefront GIDs. 
+	OrderId *string `json:"orderId,omitempty" validate:"regexp=^[a-zA-Z0-9_\\\\-\\\\.:\\/]{1,128}$"`
+	// Value of the order total in the specified currency.
 	OrderTotal *float32 `json:"orderTotal,omitempty"`
-	// Shipping method for the order.
+	// ISO 4217 three-letter currency code (e.g., 'USD', 'EUR', 'GBP').
+	Currency *string `json:"currency,omitempty" validate:"regexp=^[A-Z]{3}$"`
+	// Primary shipping fulfillment method.
 	ShippingMethod *string `json:"shippingMethod,omitempty"`
-	// Number of items in the order.
+	FulfillmentSpeed *FulfillmentSpeedEnum `json:"fulfillmentSpeed,omitempty"`
+	// Total count of individual line items in the cart.
 	LineItemCount *int32 `json:"lineItemCount,omitempty"`
+	// True if any item in the cart is digital / non-physical.
+	ContainsDigitalGoods *bool `json:"containsDigitalGoods,omitempty"`
+	// True if any item is a cash-equivalent gift card or voucher.
+	ContainsGiftCards *bool `json:"containsGiftCards,omitempty"`
+	// Highest unit price of a single item in the cart.
+	MaxSingleItemPrice *float32 `json:"maxSingleItemPrice,omitempty"`
+	// Ordered collection of items in the purchase.
+	LineItems []LineItem `json:"lineItems,omitempty"`
 }
 
 // NewOrderContext instantiates a new OrderContext object
@@ -111,6 +122,38 @@ func (o *OrderContext) SetOrderTotal(v float32) {
 	o.OrderTotal = &v
 }
 
+// GetCurrency returns the Currency field value if set, zero value otherwise.
+func (o *OrderContext) GetCurrency() string {
+	if o == nil || IsNil(o.Currency) {
+		var ret string
+		return ret
+	}
+	return *o.Currency
+}
+
+// GetCurrencyOk returns a tuple with the Currency field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *OrderContext) GetCurrencyOk() (*string, bool) {
+	if o == nil || IsNil(o.Currency) {
+		return nil, false
+	}
+	return o.Currency, true
+}
+
+// HasCurrency returns a boolean if a field has been set.
+func (o *OrderContext) HasCurrency() bool {
+	if o != nil && !IsNil(o.Currency) {
+		return true
+	}
+
+	return false
+}
+
+// SetCurrency gets a reference to the given string and assigns it to the Currency field.
+func (o *OrderContext) SetCurrency(v string) {
+	o.Currency = &v
+}
+
 // GetShippingMethod returns the ShippingMethod field value if set, zero value otherwise.
 func (o *OrderContext) GetShippingMethod() string {
 	if o == nil || IsNil(o.ShippingMethod) {
@@ -141,6 +184,38 @@ func (o *OrderContext) HasShippingMethod() bool {
 // SetShippingMethod gets a reference to the given string and assigns it to the ShippingMethod field.
 func (o *OrderContext) SetShippingMethod(v string) {
 	o.ShippingMethod = &v
+}
+
+// GetFulfillmentSpeed returns the FulfillmentSpeed field value if set, zero value otherwise.
+func (o *OrderContext) GetFulfillmentSpeed() FulfillmentSpeedEnum {
+	if o == nil || IsNil(o.FulfillmentSpeed) {
+		var ret FulfillmentSpeedEnum
+		return ret
+	}
+	return *o.FulfillmentSpeed
+}
+
+// GetFulfillmentSpeedOk returns a tuple with the FulfillmentSpeed field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *OrderContext) GetFulfillmentSpeedOk() (*FulfillmentSpeedEnum, bool) {
+	if o == nil || IsNil(o.FulfillmentSpeed) {
+		return nil, false
+	}
+	return o.FulfillmentSpeed, true
+}
+
+// HasFulfillmentSpeed returns a boolean if a field has been set.
+func (o *OrderContext) HasFulfillmentSpeed() bool {
+	if o != nil && !IsNil(o.FulfillmentSpeed) {
+		return true
+	}
+
+	return false
+}
+
+// SetFulfillmentSpeed gets a reference to the given FulfillmentSpeedEnum and assigns it to the FulfillmentSpeed field.
+func (o *OrderContext) SetFulfillmentSpeed(v FulfillmentSpeedEnum) {
+	o.FulfillmentSpeed = &v
 }
 
 // GetLineItemCount returns the LineItemCount field value if set, zero value otherwise.
@@ -175,6 +250,134 @@ func (o *OrderContext) SetLineItemCount(v int32) {
 	o.LineItemCount = &v
 }
 
+// GetContainsDigitalGoods returns the ContainsDigitalGoods field value if set, zero value otherwise.
+func (o *OrderContext) GetContainsDigitalGoods() bool {
+	if o == nil || IsNil(o.ContainsDigitalGoods) {
+		var ret bool
+		return ret
+	}
+	return *o.ContainsDigitalGoods
+}
+
+// GetContainsDigitalGoodsOk returns a tuple with the ContainsDigitalGoods field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *OrderContext) GetContainsDigitalGoodsOk() (*bool, bool) {
+	if o == nil || IsNil(o.ContainsDigitalGoods) {
+		return nil, false
+	}
+	return o.ContainsDigitalGoods, true
+}
+
+// HasContainsDigitalGoods returns a boolean if a field has been set.
+func (o *OrderContext) HasContainsDigitalGoods() bool {
+	if o != nil && !IsNil(o.ContainsDigitalGoods) {
+		return true
+	}
+
+	return false
+}
+
+// SetContainsDigitalGoods gets a reference to the given bool and assigns it to the ContainsDigitalGoods field.
+func (o *OrderContext) SetContainsDigitalGoods(v bool) {
+	o.ContainsDigitalGoods = &v
+}
+
+// GetContainsGiftCards returns the ContainsGiftCards field value if set, zero value otherwise.
+func (o *OrderContext) GetContainsGiftCards() bool {
+	if o == nil || IsNil(o.ContainsGiftCards) {
+		var ret bool
+		return ret
+	}
+	return *o.ContainsGiftCards
+}
+
+// GetContainsGiftCardsOk returns a tuple with the ContainsGiftCards field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *OrderContext) GetContainsGiftCardsOk() (*bool, bool) {
+	if o == nil || IsNil(o.ContainsGiftCards) {
+		return nil, false
+	}
+	return o.ContainsGiftCards, true
+}
+
+// HasContainsGiftCards returns a boolean if a field has been set.
+func (o *OrderContext) HasContainsGiftCards() bool {
+	if o != nil && !IsNil(o.ContainsGiftCards) {
+		return true
+	}
+
+	return false
+}
+
+// SetContainsGiftCards gets a reference to the given bool and assigns it to the ContainsGiftCards field.
+func (o *OrderContext) SetContainsGiftCards(v bool) {
+	o.ContainsGiftCards = &v
+}
+
+// GetMaxSingleItemPrice returns the MaxSingleItemPrice field value if set, zero value otherwise.
+func (o *OrderContext) GetMaxSingleItemPrice() float32 {
+	if o == nil || IsNil(o.MaxSingleItemPrice) {
+		var ret float32
+		return ret
+	}
+	return *o.MaxSingleItemPrice
+}
+
+// GetMaxSingleItemPriceOk returns a tuple with the MaxSingleItemPrice field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *OrderContext) GetMaxSingleItemPriceOk() (*float32, bool) {
+	if o == nil || IsNil(o.MaxSingleItemPrice) {
+		return nil, false
+	}
+	return o.MaxSingleItemPrice, true
+}
+
+// HasMaxSingleItemPrice returns a boolean if a field has been set.
+func (o *OrderContext) HasMaxSingleItemPrice() bool {
+	if o != nil && !IsNil(o.MaxSingleItemPrice) {
+		return true
+	}
+
+	return false
+}
+
+// SetMaxSingleItemPrice gets a reference to the given float32 and assigns it to the MaxSingleItemPrice field.
+func (o *OrderContext) SetMaxSingleItemPrice(v float32) {
+	o.MaxSingleItemPrice = &v
+}
+
+// GetLineItems returns the LineItems field value if set, zero value otherwise.
+func (o *OrderContext) GetLineItems() []LineItem {
+	if o == nil || IsNil(o.LineItems) {
+		var ret []LineItem
+		return ret
+	}
+	return o.LineItems
+}
+
+// GetLineItemsOk returns a tuple with the LineItems field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *OrderContext) GetLineItemsOk() ([]LineItem, bool) {
+	if o == nil || IsNil(o.LineItems) {
+		return nil, false
+	}
+	return o.LineItems, true
+}
+
+// HasLineItems returns a boolean if a field has been set.
+func (o *OrderContext) HasLineItems() bool {
+	if o != nil && !IsNil(o.LineItems) {
+		return true
+	}
+
+	return false
+}
+
+// SetLineItems gets a reference to the given []LineItem and assigns it to the LineItems field.
+func (o *OrderContext) SetLineItems(v []LineItem) {
+	o.LineItems = v
+}
+
 func (o OrderContext) MarshalJSON() ([]byte, error) {
 	toSerialize,err := o.ToMap()
 	if err != nil {
@@ -191,11 +394,29 @@ func (o OrderContext) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.OrderTotal) {
 		toSerialize["orderTotal"] = o.OrderTotal
 	}
+	if !IsNil(o.Currency) {
+		toSerialize["currency"] = o.Currency
+	}
 	if !IsNil(o.ShippingMethod) {
 		toSerialize["shippingMethod"] = o.ShippingMethod
 	}
+	if !IsNil(o.FulfillmentSpeed) {
+		toSerialize["fulfillmentSpeed"] = o.FulfillmentSpeed
+	}
 	if !IsNil(o.LineItemCount) {
 		toSerialize["lineItemCount"] = o.LineItemCount
+	}
+	if !IsNil(o.ContainsDigitalGoods) {
+		toSerialize["containsDigitalGoods"] = o.ContainsDigitalGoods
+	}
+	if !IsNil(o.ContainsGiftCards) {
+		toSerialize["containsGiftCards"] = o.ContainsGiftCards
+	}
+	if !IsNil(o.MaxSingleItemPrice) {
+		toSerialize["maxSingleItemPrice"] = o.MaxSingleItemPrice
+	}
+	if !IsNil(o.LineItems) {
+		toSerialize["lineItems"] = o.LineItems
 	}
 	return toSerialize, nil
 }
